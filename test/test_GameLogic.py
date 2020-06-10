@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-import GameLogic
+from src import GameLogic
 
 
 class TestGameLogic(TestCase):
