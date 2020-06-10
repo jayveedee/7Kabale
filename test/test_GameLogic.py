@@ -51,7 +51,19 @@ class TestGameLogic(TestCase):
         self.fail()
 
     def test_reset_logic(self):
-        self.fail()
+        self.insertVariables()
+
+        testWas, testTab, testFou = self.gl.resetLogic(None, None, None)
+
+        self.assertIsNone(testWas)
+        self.assertIsNone(testTab)
+        self.assertIsNone(testFou)
+
+        testWas, testTab, testFou = self.gl.resetLogic([""], {0: ["a", "b", "c"], 1: ["a"]}, {0: ["d", "e", "c"], 1: ["k"]})
+
+        self.assertListEqual(testWas, [""])
+        self.assertDictEqual(testTab, {0: ["a", "b", "c"], 1: ["a"]})
+        self.assertDictEqual(testFou, {0: ["d", "e", "c"], 1: ["k"]})
 
     def test_calculate_move(self):
         self.insertVariables()

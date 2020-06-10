@@ -30,6 +30,8 @@ class GameLogic:
             # UPDATING THE FOUNDATION LIST WITH THE NEW CARDS
             self.checkListConsistency(logicFoundationCardPiles, self.logicFoundationCardPiles)
 
+        return self.logicWasteCard, self.logicTableauCardPiles, self.logicFoundationCardPiles
+
     def checkListConsistency(self, listOne, listTwo):
         for i in range(len(listOne)):
 
@@ -58,7 +60,7 @@ class GameLogic:
 
         # RESET METHOD TO RESTART THE GAME
         self.reset = True
-        self.updateLogicR(logicWasteCard, logicTableauCardPiles, logicFoundationCardPiles)
+        return self.updateLogicR(logicWasteCard, logicTableauCardPiles, logicFoundationCardPiles)
 
     def updateLogicM(self, move):
 
