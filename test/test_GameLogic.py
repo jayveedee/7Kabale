@@ -57,6 +57,21 @@ class TestGameLogic(TestCase):
         self.insertVariables()
 
         self.assertListEqual(self.gl.calculateMove(), ["5", "h", "2", "0", "T"])
+        self.gl.updateLogicM(self.gl.calculateMove())
+        self.assertListEqual(self.gl.calculateMove(), ["1", "s", "4", "0", "F"])
+        self.gl.updateLogicM(self.gl.calculateMove())
+        self.assertListEqual(self.gl.calculateMove(), ["13", "s", "5", "2", "T"])
+        self.gl.updateLogicM(self.gl.calculateMove())
+        self.assertListEqual(self.gl.calculateMove(), ["3", "h", "6", "2", "F"])
+        self.gl.updateLogicM(self.gl.calculateMove())
+        self.assertListEqual(self.gl.calculateMove(), ["1", "r", "-1", "1", "F"])
+        self.gl.updateLogicM(self.gl.calculateMove())
+        self.gl.logicTableauCardPiles.get(5).clear()
+        self.gl.logicTableauCardPiles.get(5).append("4 h")
+        self.assertListEqual(self.gl.calculateMove(), ["4", "h", "5", "2", "F"])
+        self.gl.updateLogicM(self.gl.calculateMove())
+        self.gl.logicWasteCard = ["12", "r"]
+        self.assertListEqual(self.gl.calculateMove(), ["12", "r", "-1", "2", "T"])
 
     def test_updateM_logic(self):
         self.insertVariables()
