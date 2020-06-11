@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from src import GameLogic
+from Inference import GameLogic
 
 import random
 
