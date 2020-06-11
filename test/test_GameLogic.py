@@ -82,7 +82,9 @@ class TestGameLogic(TestCase):
         self.insertVariables()
 
         testWas, testTab, testFou = self.gl.updateLogicR([""], self.createDummyList(0), self.createDummyList(0))
-        self.assertListEqual(testWas,)
+        self.assertListEqual(testWas, ["1", "d"])
+        self.assertListEqual(testTab, self.logicTableauCardPiles)
+        self.assertListEqual(testFou, self.logicFoundationCardPiles)
 
     def test_check_list_consistency(self):
         self.insertVariables()
