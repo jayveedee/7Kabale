@@ -2,7 +2,6 @@ import os
 import sys
 import cv2
 
-
 """
 This file is a modified version of the Detector.py from 
 the following repository: https://github.com/AntonMu/TrainYourOwnYOLO
@@ -22,10 +21,8 @@ def get_parent_dir(n=1):
 src_path = os.path.join(get_parent_dir(1), "src")
 utils_path = os.path.join(get_parent_dir(1), "Utils")
 
-
 sys.path.append(src_path)
 sys.path.append(utils_path)
-
 
 cap = cv2.VideoCapture(0)
 
@@ -34,6 +31,7 @@ cap = cv2.VideoCapture(0)
 
 import argparse
 import Dictionaries
+import GameLogic
 from keras_yolo3.yolo import YOLO
 from PIL import Image
 import numpy as np
@@ -45,14 +43,17 @@ dictionaryOfIndexToName = Dictionaries.dictionaryOfIndexToName
 dictionaryOfCardFrameCounter = Dictionaries.dictionaryOfCardFrameCounter
 dictionaryOfDetectedCards = Dictionaries.dictionaryOfDetectedCards
 
-
 current_pile = 0
 
 
 def detect_card(some_prediction):
     card_name = dictionaryOfIndexToName.get(some_prediction[4])
     dictionaryOfDetectedCards[card_name] = True
-    dictionary_of_piles[current_pile].append(card_name)
+    if current_pile == 11:
+        split_string_array = card_name.split()
+        dictionary_of_piles[current_pile].append(split_string_array)
+    else:
+        dictionary_of_piles[current_pile].append(card_name)
     return
 
 
@@ -87,9 +88,10 @@ def show_detected_cards(some_image):
 # displays various text
 def show_text(some_image):
     cv2.putText(opencv_image, "'ESC' to exit", (0, 30), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
-    cv2.putText(opencv_image, "'a' to clear current pile", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
+    cv2.putText(opencv_image, "'c' to clear current pile", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
                 (209, 80, 0, 255), 2)
     cv2.putText(opencv_image, "'SPACE' for next pile", (0, 110), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
+    cv2.putText(opencv_image, "'e' for done scanning", (0, 150), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
 
     current_pile_text = "current pile: "
     current_pile_name = dictionary_of_pile_names.get(current_pile)
@@ -97,7 +99,7 @@ def show_text(some_image):
     text_size = cv2.getTextSize(current_pile_text, cv2.FONT_HERSHEY_DUPLEX, .75, 2)[0]
     image_width = some_image.shape[1]
 
-    x_coordinate = image_width-text_size[0]
+    x_coordinate = image_width - text_size[0]
     cv2.putText(opencv_image, current_pile_text, (x_coordinate, 30),
                 cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
     return
@@ -120,6 +122,33 @@ def clear_current_pile():
         dictionaryOfCardFrameCounter[card] = 0
 
     dictionary_of_piles[current_pile].clear()
+
+    return
+
+
+def done_scanning():
+    # send data to Logic
+    list_of_tableu_piles = {0: [],
+                            1: [],
+                            2: [],
+                            3: [],
+                            4: [],
+                            5: [],
+                            6: []}
+    list_of_foundation_piles = {7: [],
+                                8: [],
+                                9: [],
+                                10: []}
+    for pile in range(11):
+        if pile > 6:
+            list_of_foundation_piles[pile] = list_of_piles[pile]
+        else:
+            list_of_tableu_piles[pile] = list_of_piles[pile]
+    game_logic = GameLogic.GameLogic(list_of_piles[11], list_of_tableu_piles, list_of_foundation_piles)
+
+    moves = game_logic.calculateMove()
+    for move in moves:
+        print(move)
 
     return
 
@@ -251,10 +280,13 @@ if __name__ == "__main__":
         k = cv2.waitKey(30) & 0xff
         if k == 27:  # When 'ESC" is pressed, we exit.
             break
-        if k == 97:  # When 'a' is pressed we clear current pile
+        if k == 99:  # When 'c' is pressed we clear current pile
             clear_current_pile()
         if k == 32:  # When 'SPACE' is pressed we change pile
             change_pile()
+        if k == 101:  # When 'e' is pressed, we stop scanning
+            done_scanning()
+            break
 
     cv2.destroyAllWindows()
     cap.release()
