@@ -140,6 +140,14 @@ class TestGameLogic(TestCase):
         self.gl.updateLogicM(self.gl.calculateMove())
         self.gl.logicWasteCard = ["12", "d"]
         self.assertListEqual(self.gl.calculateMove(), ["12", "d", "-1", "2", "T"])
+        self.gl.updateLogicM(self.gl.calculateMove())
+        self.gl.logicFoundationCardPiles.clear()
+        self.gl.logicFoundationCardPiles = {0: [], 1: [], 2: [], 3: []}
+        self.gl.logicFoundationCardPiles[2] = ["2 c"]
+        self.assertListEqual(self.gl.calculateMove(), ['11', 's', '1', '2', 'T'])
+        self.gl.updateLogicM(self.gl.calculateMove())
+        # SHOULD BE ERROR, PLS FIX
+        self.assertListEqual(self.gl.calculateMove(), ['12', 'd', '2', '3', 'T'])
 
     def test_updateM_logic(self):
         self.insertVariables()
