@@ -48,43 +48,52 @@ class TestGameLogic(TestCase):
     def createDummyList(self, dummyVersion=0):
 
         dummyList = {}
-        for i in range(0, 7):
-            tempList = []
+        if dummyVersion >= 0:
 
-            if dummyVersion == 1:
-                if i == 2:
-                    cardNumber = 2
-                    cardType = "d"
-                    tempList.append(str(cardNumber) + " " + cardType)
+            for i in range(0, 7):
+                tempList = []
 
-            if dummyVersion == 2:
-                if i != 2:
-                    cardNumber = random.randint(1, 13)
-                    cardType = random.choice("hdsc")
-                    tempList.append(str(cardNumber) + " " + cardType)
+                if dummyVersion == 1:
+                    if i == 2:
+                        cardNumber = 2
+                        cardType = "d"
+                        tempList.append(str(cardNumber) + " " + cardType)
 
-            if dummyVersion == 3:
-                if i > 3:
-                    for j in range(0, i):
+                if dummyVersion == 2:
+                    if i != 2:
                         cardNumber = random.randint(1, 13)
                         cardType = random.choice("hdsc")
                         tempList.append(str(cardNumber) + " " + cardType)
-                else:
-                    cardNumber = random.randint(1, 13)
-                    cardType = random.choice("hdsc")
-                    tempList.append(str(cardNumber) + " " + cardType)
 
-            dummyList[i] = tempList
+                if dummyVersion == 3:
+                    if i > 3:
+                        for j in range(0, i):
+                            cardNumber = random.randint(1, 13)
+                            cardType = random.choice("hdsc")
+                            tempList.append(str(cardNumber) + " " + cardType)
+                    else:
+                        cardNumber = random.randint(1, 13)
+                        cardType = random.choice("hdsc")
+                        tempList.append(str(cardNumber) + " " + cardType)
+
+                dummyList[i] = tempList
+
+        if dummyVersion == -1:
+            for i in range(0, 4):
+                tempList = []
+                dummyList[i] = tempList
 
         return dummyList
 
     def test_updateR_logic(self):
         self.insertVariables()
 
-        testWas, testTab, testFou = self.gl.updateLogicR([""], self.createDummyList(0), self.createDummyList(0))
-        self.assertListEqual(testWas, ["1", "d"])
-        self.assertListEqual(testTab, self.logicTableauCardPiles)
-        self.assertListEqual(testFou, self.logicFoundationCardPiles)
+        testWas, testTab, testFou = self.gl.updateLogicR([""], self.createDummyList(0), self.createDummyList(-1))
+        self.assertListEqual(testWas, [""])
+        self.assertDictEqual(testTab, self.logicTableauCardPiles)
+        self.assertDictEqual(testFou, self.logicFoundationCardPiles)
+
+
 
     def test_check_list_consistency(self):
         self.insertVariables()
