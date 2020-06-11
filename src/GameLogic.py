@@ -33,28 +33,21 @@ class GameLogic:
         return self.logicWasteCard, self.logicTableauCardPiles, self.logicFoundationCardPiles
 
     def checkListConsistency(self, listOne, listTwo):
-        for i in range(len(listOne)):
+        for i in range(0, len(listOne)):
 
-            # IF THE NEW LIST IS EMPTY, IT MEANS THAT THERE IS NO CARD ON THAT SPOT
-            if listOne.get(i) != 0:
-
-                # IF THERE WAS NOTHING IN THE LOGIC LIST, BUT THERE WAS SOMETHING IN THE UPDATED LIST, WE ADD THE
-                # WHOLE LIST TO THE LOGIC
-                if listTwo.get(i) != 0:
-                    listTwo = listOne
-                    break
-
-                # IF THE LOGIC LIST ALSO EXISTS, WE ONLY ADD THE FIRST ELEMENT AND SORT THE LIST SO THAT THE NEW
-                # VALUE WILL BE THE FIRST ELEMENT
-                else:
-                    if listOne.get(i)[0] != listTwo.get(i)[0]:
+            if len(listOne.get(i)) != len(listTwo.get(i)):
+                if len(listOne.get(i)) != 0:
+                    if len(listTwo.get(i)) == 0:
+                        listTwo[i] = listOne.get(i)
+                    else:
                         listTwo.get(i).append(listOne.get(i)[0])
+                        listTwo.get(i).sort(reverse=False)
+            elif len(listOne.get(i)) != 0 and len(listTwo.get(i)) != 0:
+                if listOne.get(i)[0] != listTwo.get(i)[0]:
+                    listTwo.get(i).append(listOne.get(i)[0])
+                    listTwo.get(i).sort(reverse=False)
 
-            # IF THE UPDATED LIST IS EMPTY BUT THE LOGIC LIST IS NOT, WE UPDATE IT
-            else:
-                if listTwo.get(i) != 0:
-                    listTwo = listOne
-                    break
+        return listTwo
 
     def resetLogic(self, logicWasteCard, logicTableauCardPiles, logicFoundationCardPiles):
 
@@ -255,8 +248,8 @@ class GameLogic:
             if neighborCardNumber > 0:
 
                 # CHECKS IF THE TYPES OF BOTH CARDS MATCH TOGETHER r+h<->k+s k+s<->r+h
-                if ((cardType == "r" or cardType == "h") and (neighborCardType == "k" or neighborCardType == "s")) or \
-                        ((cardType == "k" or cardType == "s") and (neighborCardType == "r" or neighborCardType == "h")):
+                if ((cardType == "d" or cardType == "h") and (neighborCardType == "c" or neighborCardType == "s")) or \
+                        ((cardType == "c" or cardType == "s") and (neighborCardType == "d" or neighborCardType == "h")):
 
                     # CHECKS IF THE NUMBER OF THE NEIGHBOUR CARD IS 1 HIGHER THAN THE CURRENT CARD. IF IT IS,
                     # WE CAN THEN PLACE THE CURRENT CARD ON THE NEIGHBOUR CARD
