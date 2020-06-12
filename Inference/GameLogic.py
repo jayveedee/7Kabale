@@ -191,26 +191,27 @@ class GameLogic:
 
         # CHECKS IF THERE EXISTS A WASTE CARD
         if self.logicWasteCard is not None:
+            if len(self.logicWasteCard) != 0:
+                # DEFINE WASTE CARD NUMBER AND TYPE
+                wasteCardArray = self.logicWasteCard[len(self.logicWasteCard) - 1]
+                wasteCardNumber = int(wasteCardArray[0])
+                wasteCardType = wasteCardArray[1]
 
-            # DEFINE WASTE CARD NUMBER AND TYPE
-            wasteCardNumber = int(self.logicWasteCard[0])
-            wasteCardType = self.logicWasteCard[1]
+                # ITERATE THROUGH CARD PILES TO SEE IF WASTE CARD CAN BE PLACED SOMEWHERE
+                for i in range(len(self.logicTableauCardPiles)):
 
-            # ITERATE THROUGH CARD PILES TO SEE IF WASTE CARD CAN BE PLACED SOMEWHERE
-            for i in range(len(self.logicTableauCardPiles)):
+                    if len(self.logicTableauCardPiles.get(i)) > 0:
 
-                if len(self.logicTableauCardPiles.get(i)) > 0:
+                        # DEFINE NEIGHBOR CARDS
+                        nextTableauCardPile = self.logicTableauCardPiles.get(i)[0]
+                        nextCardArray = nextTableauCardPile.split()
+                        nextCardNumber = int(nextCardArray[0])
+                        nextCardType = nextCardArray[1]
 
-                    # DEFINE NEIGHBOR CARDS
-                    nextTableauCardPile = self.logicTableauCardPiles.get(i)[0]
-                    nextCardArray = nextTableauCardPile.split()
-                    nextCardNumber = int(nextCardArray[0])
-                    nextCardType = nextCardArray[1]
-
-                    # CHECKS IF WASTE CARD CAN BE PLACED ON CURRENT PILE IN THE LIST
-                    if self.checkCardPlacement(-1, wasteCardNumber, wasteCardType, i, nextCardNumber, nextCardType,
-                                           False):
-                        return self.result
+                        # CHECKS IF WASTE CARD CAN BE PLACED ON CURRENT PILE IN THE LIST
+                        if self.checkCardPlacement(-1, wasteCardNumber, wasteCardType, i, nextCardNumber, nextCardType,
+                                               False):
+                            return self.result
 
         return ["NA", "NA", "NA", "NA", "NA"]
 

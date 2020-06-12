@@ -36,6 +36,7 @@ from keras_yolo3.yolo import YOLO
 from PIL import Image
 import numpy as np
 
+move_text = ""
 list_of_piles = Dictionaries.list_of_piles
 dictionary_of_piles = Dictionaries.dictionary_of_piles
 dictionary_of_pile_names = Dictionaries.dictionary_of_pile_names
@@ -49,6 +50,8 @@ current_pile = 0
 def detect_card(some_prediction):
     card_name = dictionaryOfIndexToName.get(some_prediction[4])
     dictionaryOfDetectedCards[card_name] = True
+
+    # if the card is detected in the waste card pile, we split it to make it work with logic.
     if current_pile == 11:
         split_string_array = card_name.split()
         dictionary_of_piles[current_pile].append(split_string_array)
@@ -77,8 +80,14 @@ def increment_card_viewed_counter(some_prediction):
 def show_detected_cards(some_image):
     list_of_detected_cards = "Cards: "
 
+    # see detect_card function for an explanation of why current_pile = 11 is unique.
     for some_name in dictionary_of_piles[current_pile]:
-        list_of_detected_cards += some_name
+        if current_pile == 11:
+            list_of_detected_cards += some_name[0]
+            list_of_detected_cards += some_name[1]
+        else:
+            list_of_detected_cards += some_name
+
         list_of_detected_cards += " ,"
     cv2.putText(some_image, list_of_detected_cards, (0, 200), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
 
@@ -86,22 +95,29 @@ def show_detected_cards(some_image):
 
 
 # displays various text
-def show_text(some_image):
+def show_text(some_image, move):
     cv2.putText(opencv_image, "'ESC' to exit", (0, 30), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
-    cv2.putText(opencv_image, "'c' to clear current pile", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
-                (209, 80, 0, 255), 2)
-    cv2.putText(opencv_image, "'SPACE' for next pile", (0, 110), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
-    cv2.putText(opencv_image, "'e' for done scanning", (0, 150), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
+    if move is not None and move[0] is not "NA":
+        cv2.putText(opencv_image, "'e' to confirm move", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
+                    (209, 80, 0, 255), 2)
 
-    current_pile_text = "current pile: "
-    current_pile_name = dictionary_of_pile_names.get(current_pile)
-    current_pile_text += current_pile_name
-    text_size = cv2.getTextSize(current_pile_text, cv2.FONT_HERSHEY_DUPLEX, .75, 2)[0]
-    image_width = some_image.shape[1]
+    else:
+        cv2.putText(opencv_image, "'c' to clear current pile", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
+                    (209, 80, 0, 255), 2)
+        cv2.putText(opencv_image, "'SPACE' for next pile", (0, 110), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
+        cv2.putText(opencv_image, "'e' for done scanning", (0, 150), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
+        current_pile_text = "current pile: "
+        current_pile_name = dictionary_of_pile_names.get(current_pile)
+        current_pile_text += current_pile_name
+        text_size = cv2.getTextSize(current_pile_text, cv2.FONT_HERSHEY_DUPLEX, .75, 2)[0]
+        image_width = some_image.shape[1]
 
-    x_coordinate = image_width - text_size[0]
-    cv2.putText(opencv_image, current_pile_text, (x_coordinate, 30),
-                cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
+        x_coordinate = image_width - text_size[0]
+        cv2.putText(opencv_image, current_pile_text, (x_coordinate, 30),
+                    cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
+
+        show_detected_cards(some_image)
+
     return
 
 
@@ -118,8 +134,13 @@ def change_pile():
 
 def clear_current_pile():
     for card in dictionary_of_piles[current_pile]:
-        dictionaryOfDetectedCards[card] = False
-        dictionaryOfCardFrameCounter[card] = 0
+        if current_pile == 11:
+            card_name = card[0] + " " + card[1]
+            dictionaryOfDetectedCards[card_name] = False
+            dictionaryOfCardFrameCounter[card_name] = 0
+        else:
+            dictionaryOfDetectedCards[card] = False
+            dictionaryOfCardFrameCounter[card] = 0
 
     dictionary_of_piles[current_pile].clear()
 
@@ -135,23 +156,55 @@ def done_scanning():
                             4: [],
                             5: [],
                             6: []}
-    list_of_foundation_piles = {7: [],
-                                8: [],
-                                9: [],
-                                10: []}
+    list_of_foundation_piles = {0: [],
+                                1: [],
+                                2: [],
+                                3: []}
     for pile in range(11):
         if pile > 6:
-            list_of_foundation_piles[pile] = list_of_piles[pile]
+            list_of_foundation_piles[pile-7] = list_of_piles[pile]
         else:
             list_of_tableu_piles[pile] = list_of_piles[pile]
     game_logic = GameLogic.GameLogic(list_of_piles[11], list_of_tableu_piles, list_of_foundation_piles)
 
-    moves = game_logic.calculateMove()
-    for move in moves:
-        print(move)
+    move = game_logic.calculateMove()
+
+    return move
+
+
+def display_move(move, some_image):
+    global move_text
+    if move[0] == "NA":
+        move_text = "No Valid move"
+    else:
+        global is_confirming_move
+        is_confirming_move = True
+
+        card_number = move[0]
+        card_suit = move[1]
+        from_pile = move[2]
+        to_pile = move[3]
+        pile_group = move[4]
+
+        move_text = f"move {card_number}{card_suit} from pile {int(from_pile) + 1} to pile {int(to_pile) + 1} " \
+                    f"in group {pile_group}"
+
+    print(move_text)
+
+    text_size = cv2.getTextSize(move_text, cv2.FONT_HERSHEY_DUPLEX, .75, 2)[0]
+    x_coordinate = (some_image.shape[1] - text_size[0])/2
+    y_coordinate = (some_image.shape[0] - text_size[1])
+
+    x_coordinate_rounded = int(round(x_coordinate))
+    y_coordinate_rounded = int(round(y_coordinate))
+    cv2.putText(some_image, move_text, (x_coordinate_rounded, y_coordinate_rounded), cv2.FONT_HERSHEY_DUPLEX, .75,
+                (0, 255, 0, 255), 2)
 
     return
 
+def get_input():
+
+    return
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
@@ -228,7 +281,11 @@ if __name__ == "__main__":
     input_labels = [line.rstrip("\n") for line in class_file.readlines()]
     print("Found {} input labels: {} ...".format(len(input_labels), input_labels))
 
-    while True:
+    game_has_ended = False
+    some_move = None
+    is_confirming_move = False
+
+    while not game_has_ended:
         ret, img = cap.read()
         im_pil = Image.fromarray(img)
         predictions, image = yolo.detect_image(im_pil)
@@ -274,19 +331,25 @@ if __name__ == "__main__":
                 dictionaryOfCardFrameCounter[key] = 0
 
         opencv_image = np.asarray(image)
-        show_text(opencv_image)
-        show_detected_cards(opencv_image)
-        cv2.imshow('img', opencv_image)
+
         k = cv2.waitKey(30) & 0xff
         if k == 27:  # When 'ESC" is pressed, we exit.
             break
-        if k == 99:  # When 'c' is pressed we clear current pile
+        if k == 99 and not is_confirming_move:  # When 'c' is pressed we clear current pile
             clear_current_pile()
-        if k == 32:  # When 'SPACE' is pressed we change pile
+        if k == 32 and not is_confirming_move:  # When 'SPACE' is pressed we change pile
             change_pile()
         if k == 101:  # When 'e' is pressed, we stop scanning
-            done_scanning()
-            break
+            if is_confirming_move:
+                is_confirming_move = False
+            else:
+                some_move = done_scanning()
+
+        if some_move is not None:
+            display_move(some_move, opencv_image)
+
+        show_text(opencv_image, some_move)
+        cv2.imshow('img', opencv_image)
 
     cv2.destroyAllWindows()
     cap.release()
