@@ -1,7 +1,7 @@
 class GameLogic:
 
     def __init__(self, logicWasteCard, logicTableauCardPiles, logicFoundationCardPiles):
-        self.logicWasteCard = []
+        self.logicWasteCard = [[]]
         self.logicTableauCardPiles = {}
         self.logicFoundationCardPiles = {}
         self.reset = True
@@ -12,7 +12,9 @@ class GameLogic:
 
         # IF THE LISTS DO NOT EXIST OR IF THE RESET METHOD HAS BEEN CALLED, THE BELOW FUNCTION WILL RESET/INITIALIZE
         # THE OBJECT INSTANCE VARIABLES
-        if (self.logicTableauCardPiles is None and self.logicFoundationCardPiles is None and self.logicWasteCard is None) or (self.reset is True):
+        if (
+                self.logicTableauCardPiles is None and self.logicFoundationCardPiles is None and self.logicWasteCard is None) or (
+                self.reset is True):
             self.logicWasteCard = logicWasteCard
             self.logicTableauCardPiles = logicTableauCardPiles
             self.logicFoundationCardPiles = logicFoundationCardPiles
@@ -22,7 +24,14 @@ class GameLogic:
         else:
 
             # UPDATING THE WASTE CARD
-            self.logicWasteCard = logicWasteCard
+            if logicWasteCard is not None and len(logicWasteCard) != 0:
+                if len(logicWasteCard) < len(self.logicWasteCard):
+                    self.logicWasteCard.pop(len(self.logicWasteCard) - 1)
+                elif len(logicWasteCard) > len(self.logicWasteCard):
+                    for i in range(len(logicWasteCard)):
+                        self.logicWasteCard.append(logicWasteCard[i])
+                else:
+                    self.logicWasteCard = logicWasteCard
 
             # UPDATING THE TABLEAU LIST WITH THE NEW CARDS
             self.checkListConsistency(logicTableauCardPiles, self.logicTableauCardPiles)
@@ -91,9 +100,10 @@ class GameLogic:
 
                 # IF IT'S A WASTE CARD, WE USE THE WASTE CARD STRING ARRAY
                 else:
+                    wasteCardArray = self.logicWasteCard[len(self.logicWasteCard) - 1]
                     self.logicTableauCardPiles.get(cardPileMovedTo).append \
-                        (self.logicWasteCard[0] + " " + self.logicWasteCard[1])
-                    self.logicWasteCard = None
+                        (wasteCardArray[0] + " " + wasteCardArray[1])
+                    self.logicWasteCard.remove(wasteCardArray)
 
                 # SORTS THE PILE SO THAT THE SMALLEST NUMBER IS THE FIRST INDEX
                 self.logicTableauCardPiles.get(cardPileMovedTo).sort(reverse=False)
@@ -114,9 +124,10 @@ class GameLogic:
 
                 # IF IT'S A WASTE CARD, WE USE THE WASTE CARD STRING ARRAY
                 else:
+                    wasteCardArray = self.logicWasteCard[len(self.logicWasteCard) - 1]
                     self.logicFoundationCardPiles.get(cardPileMovedTo).append \
-                        (self.logicWasteCard[0] + " " + self.logicWasteCard[1])
-                    self.logicWasteCard = None
+                        (wasteCardArray[0] + " " + wasteCardArray[1])
+                    self.logicWasteCard.remove(wasteCardArray)
 
                 # SORTS THE PILE SO THAT THE BIGGEST NUMBER IS THE FIRST INDEX
                 self.logicFoundationCardPiles.get(cardPileMovedTo).sort(reverse=True)
@@ -175,42 +186,47 @@ class GameLogic:
 
                             # PREVENTS THE LOGIC MAKING USELESS MOVES SUCH AS MOVING A CARD BETWEEN TWO PILES WITHOUT
                             # CHANGING ANYTHING, INSTEAD FOCUS ON THE NEXT CARD THAT COULD MAKE A DIFFERENCE IN THE GAME
-                            if len(self.logicTableauCardPiles.get(i)) > 1 and len(self.logicTableauCardPiles.get(j)) > 1:
+                            if len(self.logicTableauCardPiles.get(i)) > 1 and len(
+                                    self.logicTableauCardPiles.get(j)) > 1:
                                 currSubPile = self.logicTableauCardPiles.get(i)[0]
                                 currSubPileArray = currSubPile.split()
                                 neigSubPile = self.logicTableauCardPiles.get(j)[0]
                                 neigSubPileArray = neigSubPile.split()
                                 if int(currSubPileArray[0]) + 1 != int(neigSubPileArray[0]):
-                                    if self.checkCardPlacement(i, currentCardNumber, currentCardType, j, nextCardNumber, nextCardType, False):
+                                    if self.checkCardPlacement(i, currentCardNumber, currentCardType, j, nextCardNumber,
+                                                               nextCardType, False):
                                         return self.result
 
                             # CHECKS IF A CARD ON TOP OF THE PILE CAN BE PLACED ANYWHERE IN THE FOUNDATION OR
                             # NEIGHBOR TABLEAU PILE
-                            elif self.checkCardPlacement(i, currentCardNumber, currentCardType, j, nextCardNumber, nextCardType, False):
+                            elif self.checkCardPlacement(i, currentCardNumber, currentCardType, j, nextCardNumber,
+                                                         nextCardType, False):
                                 return self.result
 
         # CHECKS IF THERE EXISTS A WASTE CARD
         if self.logicWasteCard is not None:
+            if len(self.logicWasteCard) != 0:
 
-            # DEFINE WASTE CARD NUMBER AND TYPE
-            wasteCardNumber = int(self.logicWasteCard[0])
-            wasteCardType = self.logicWasteCard[1]
+                # DEFINE WASTE CARD NUMBER AND TYPE
+                wasteCardArray = self.logicWasteCard[len(self.logicWasteCard) - 1]
+                wasteCardNumber = int(wasteCardArray[0])
+                wasteCardType = wasteCardArray[1]
 
-            # ITERATE THROUGH CARD PILES TO SEE IF WASTE CARD CAN BE PLACED SOMEWHERE
-            for i in range(len(self.logicTableauCardPiles)):
+                # ITERATE THROUGH CARD PILES TO SEE IF WASTE CARD CAN BE PLACED SOMEWHERE
+                for i in range(len(self.logicTableauCardPiles)):
 
-                if len(self.logicTableauCardPiles.get(i)) > 0:
+                    if len(self.logicTableauCardPiles.get(i)) > 0:
 
-                    # DEFINE NEIGHBOR CARDS
-                    nextTableauCardPile = self.logicTableauCardPiles.get(i)[0]
-                    nextCardArray = nextTableauCardPile.split()
-                    nextCardNumber = int(nextCardArray[0])
-                    nextCardType = nextCardArray[1]
+                        # DEFINE NEIGHBOR CARDS
+                        nextTableauCardPile = self.logicTableauCardPiles.get(i)[0]
+                        nextCardArray = nextTableauCardPile.split()
+                        nextCardNumber = int(nextCardArray[0])
+                        nextCardType = nextCardArray[1]
 
-                    # CHECKS IF WASTE CARD CAN BE PLACED ON CURRENT PILE IN THE LIST
-                    if self.checkCardPlacement(-1, wasteCardNumber, wasteCardType, i, nextCardNumber, nextCardType,
-                                           False):
-                        return self.result
+                        # CHECKS IF WASTE CARD CAN BE PLACED ON CURRENT PILE IN THE LIST
+                        if self.checkCardPlacement(-1, wasteCardNumber, wasteCardType, i, nextCardNumber, nextCardType,
+                                                   False):
+                            return self.result
 
         return ["NA", "NA", "NA", "NA", "NA"]
 
