@@ -146,7 +146,7 @@ def done_scanning():
             list_of_tableu_piles[pile] = list_of_piles[pile]
     game_logic = GameLogic.GameLogic(list_of_piles[11], list_of_tableu_piles, list_of_foundation_piles)
 
-    moves = game_logic.calculateMove()
+    moves = game_logic.calculate_move()
     for move in moves:
         print(move)
 

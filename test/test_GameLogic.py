@@ -100,90 +100,309 @@ def create_list(tb0, tb1, tb2, tb3, tb4, tb5, tb6):
     return tb
 
 
-def combine_list(tbfalist, card, index):
-    if card != "":
-        tbfalist.get(index).append(card)
-    return tbfalist
-
 class TestGameLogic(TestCase):
 
     def test_play_game(self):
-        tb = create_list(["6 h"], ["6 c"], ["13 d"], ["4 d"], ["3 h"], ["2 s"], ["8 c"])
-        fd = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
-        wc = [[]]
+        tb = create_list(["06 h"], ["06 c"], ["13 d"], ["04 d"], ["03 h"], ["02 s"], ["08 c"])
+        fd = {0: [], 1: [], 2: [], 3: []}
+        wc = []
 
-        gl = GameLogic.GameLogic(wc, tb, fd)
+        self.gl = GameLogic.GameLogic(wc, tb, fd)
 
-        move = gl.calculateMove()
-        self.assertListEqual(move, ["2", "s", "5", "4", "T", "T", "YES"])
-        self.assertListEqual(gl.updateLogicM(move), ["2 s", "3 h"])
-        taaa = combine_list(copy.deepcopy(gl.logicTableauCardPiles), "4 c", 5)
-        tb = create_list([], [], [], [], [], ["4 c"], [])
-        _, taa, _ = gl.updateLogicR(None, tb, None)
-        self.assertDictEqual(taa, taaa)
+        # Move & Update
+        self.calculateMove(["02", "s", "5", "4", "T", "T", "YES"], ["02 s", "03 h"])
+        self.updateLists("T", "04 c", 5)
 
-        move = gl.calculateMove()
-        self.assertListEqual(move, ["3", "h", "4", "5", "T", "T", "YES"])
-        self.assertListEqual(gl.updateLogicM(move), ["2 s", "3 h", "4 c"])
-        taaa = combine_list(copy.deepcopy(gl.logicTableauCardPiles), "5 s", 4)
-        tb = create_list([], [], [], [], ["5 s"], [], [])
-        _, taa, _ = gl.updateLogicR(None, tb, None)
-        self.assertDictEqual(taa, taaa)
+        # Move & Update
+        self.calculateMove(["03", "h", "4", "5", "T", "T", "YES"], ["02 s", "03 h", "04 c"])
+        self.updateLists("T", "05 s", 4)
 
-        move = gl.calculateMove()
-        self.assertListEqual(move, ["4", "d", "3", "4", "T", "T", "YES"])
-        self.assertListEqual(gl.updateLogicM(move), ["4 d", "5 s"])
-        taaa = combine_list(copy.deepcopy(gl.logicTableauCardPiles), "12 s", 3)
-        tb = create_list([], [], [], ["12 s"], [], [], [])
-        _, taa, _ = gl.updateLogicR(None, tb, None)
-        self.assertDictEqual(taa, taaa)
+        # Move & Update
+        self.calculateMove(["04", "d", "3", "4", "T", "T", "YES"], ["04 d", "05 s"])
+        self.updateLists("T", "12 s", 3)
 
-        move = gl.calculateMove()
-        self.assertListEqual(move, ["12", "s", "3", "2", "T", "T", "YES"])
-        self.assertListEqual(gl.updateLogicM(move), ["12 s", "13 d"])
-        taaa = combine_list(copy.deepcopy(gl.logicTableauCardPiles), "12 k", 3)
-        tb = create_list([], [], [], ["12 k"], [], [], [])
-        _, taa, _ = gl.updateLogicR(None, tb, None)
-        self.assertDictEqual(taa, taaa)
+        # Move & Update
+        self.calculateMove(["12", "s", "3", "2", "T", "T", "YES"], ["12 s", "13 d"])
+        self.updateLists("T", "12 c", 3)
 
-        move = gl.calculateMove()
-        self.assertListEqual(move, ["5", "s", "4", "0", "T", "T", "YES"])
-        self.assertListEqual(gl.updateLogicM(move), ["4 d", "5 s", "6 h"])
-        taaa = combine_list(copy.deepcopy(gl.logicTableauCardPiles), "7 s", 4)
-        tb = create_list([], [], [], [], ["7 s"], [], [])
-        _, taa, _ = gl.updateLogicR(None, tb, None)
-        self.assertDictEqual(taa, taaa)
+        # Move & Update
+        self.calculateMove(["05", "s", "4", "0", "T", "T", "YES"], ["04 d", "05 s", "06 h"])
+        self.updateLists("T", "07 s", 4)
 
-        move = gl.calculateMove()
-        self.assertListEqual(move, ["6", "h", "0", "4", "T", "T", "NO"])
-        self.assertListEqual(gl.updateLogicM(move), ["4 d", "5 s", "6 h", "7 s"])
-        taaa = combine_list(copy.deepcopy(gl.logicTableauCardPiles), "", 0)
-        tb = create_list([], [], [], [], [], [], [])
-        _, taa, _ = gl.updateLogicR(None, tb, None)
-        self.assertDictEqual(taa, taaa)
+        # Move & Update
+        self.calculateMove(["06", "h", "0", "4", "T", "T", "NO"], ["04 d", "05 s", "06 h", "07 s"])
+        self.updateLists("T", "NA", 0)
 
-        move = gl.calculateMove()
-        self.assertListEqual(move, ["13", "d", "2", "0", "T", "T", "YES"])
-        self.assertListEqual(gl.updateLogicM(move), ["12 s", "13 d"])
-        taaa = combine_list(copy.deepcopy(gl.logicTableauCardPiles), "3 d", 2)
-        tb = create_list([], [], ["3 d"], [], [], [], [])
-        _, taa, _ = gl.updateLogicR(None, tb, None)
-        self.assertDictEqual(taa, taaa)
+        # Move & Update
+        self.calculateMove(["13", "d", "2", "0", "T", "T", "YES"], ["12 s", "13 d"])
+        self.updateLists("T", "03 d", 2)
 
-        move = gl.calculateMove()
-        self.assertListEqual(move, ["NA", "NA", "NA", "NA", "NA"])
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("T", "NA", 0)
 
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "09 d", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "08 d", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "06 s", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "01 d", -1)
+
+        # Move & Update
+        self.calculateMove(["01", "d", "-1", "0", "F", "W", "YES"], ["01 d"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "01 h", -1)
+
+        # Move & Update
+        self.calculateMove(["01", "h", "-1", "1", "F", "W", "YES"], ["01 h"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "12 c", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "09 s", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "10 d", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "02 d", -1)
+
+        # Move & Update
+        self.calculateMove(["02", "d", "-1", "0", "F", "W", "YES"], ["02 d", "01 d"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["03", "d", "2", "0", "F", "T", "YES"], ["03 d", "02 d", "01 d"])
+        self.updateLists("T", "12 h", 2)
+
+        # Move & Update
+        self.calculateMove(["04", "d", "4", "0", "F", "T", "NO"], ["04 d", "03 d", "02 d", "01 d"])
+        self.updateLists("T", "NA", 4)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "11 c", -1)
+
+        # Move & Update
+        self.calculateMove(["11", "c", "-1", "2", "T", "W", "YES"], ["11 c", "12 h"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["10", "d", "-1", "2", "T", "W", "YES"], ["10 d", "11 c", "12 h"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["09", "s", "-1", "2", "T", "W", "YES"], ["09 s", "10 d", "11 c", "12 h"])
+        self.updateLists("W", "11 h", -1)
+
+        # Move & Update
+        self.calculateMove(["11", "h", "-1", "0", "T", "W", "YES"], ["11 h", "12 s", "13 d"])
+        self.updateLists("W", "8 s", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "08 h", -1)
+
+        # Move & Update
+        self.calculateMove(["08", "h", "-1", "2", "T", "W", "YES"], ["08 h", "09 s", "10 d", "11 c", "12 h"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["07", "s", "4", "2", "T", "T", "YES"], ["05 s", "06 h", "07 s", "08 h", "09 s", "10 d", "11 c", "12 h"])
+        self.updateLists("T", "10 c", 4)
+
+        # Move & Update
+        self.calculateMove(["10", "c", "4", "0", "T", "T", "YES"], ["10 c", "11 h", "12 s", "13 d"])
+        self.updateLists("T", "05 h", 4)
+
+        # Move & Update
+        self.calculateMove(["05", "h", "4", "1", "T", "T", "NO"], ["05 h", "06 c"])
+        self.updateLists("T", "NA", 4)
+
+        # Move & Update
+        self.calculateMove(["04", "c", "5", "1", "T", "T", "YES"], ["02 s", "03 h", "04 c", "05 h", "06 c"])
+        self.updateLists("T", "11 s", 5)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "13 h", -1)
+
+        # Move & Update
+        self.calculateMove(["13", "h", "-1", "4", "T", "W", "YES"], ["13 h"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["12", "c", "3", "4", "T", "T", "YES"], ["12 c", "13 h"])
+        self.updateLists("T", "11 d", 3)
+
+        # Move & Update
+        self.calculateMove(["11", "d", "3", "4", "T", "T", "NO"], ["11 d", "12 c", "13 h"])
+        self.updateLists("T", "NA", 3)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "07 c", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "05 d", -1)
+
+        # Move & Update
+        self.calculateMove(["05", "d", "-1", "0", "F", "W", "YES"], ["05 d", "04 d", "03 d", "02 d", "01 d"])
+        self.updateLists("W", "07 d", -1)
+
+        # Move & Update
+        self.calculateMove(["07", "d", "-1", "6", "T", "W", "YES"], ["07 d", "08 c"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["06", "c", "1", "6", "T", "T", "YES"], ["02 s", "03 h", "04 c", "05 h", "06 c", "07 d", "08 c"])
+        self.updateLists("T", "07 h", 1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "02 h", -1)
+
+        # Move & Update
+        self.calculateMove(["02", "h", "-1", "1", "F", "W", "YES"], ["02 h", "01 h"])
+        self.updateLists("W", "05 c", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "09 h", -1)
+
+        # Move & Update
+        self.calculateMove(["09", "h", "-1", "0", "T", "W", "YES"], ["09 h", "10 c", "11 h", "12 s", "13 d"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["08", "c", "6", "0", "T", "T", "YES"], ["02 s", "03 h", "04 c", "05 h", "06 c", "07 d", "08 c", "09 h", "10 c", "11 h", "12 s", "13 d"])
+        self.updateLists("T", "13 s", 6)
+
+        # Move & Update
+        self.calculateMove(["12", "h", "2", "6", "T", "T", "NO"], ["05 s", "06 h", "07 s", "08 h", "09 s", "10 d", "11 c", "12 h", "13 s"])
+        self.updateLists("T", "NA", 6)
+
+        # Move & Update
+        self.calculateMove(["13", "s", "6", "2", "T", "T", "YES"], ["05 s", "06 h", "07 s", "08 h", "09 s", "10 d", "11 c", "12 h", "13 s"])
+        self.updateLists("T", "12 d", 6)
+
+        # Move & Update
+        self.calculateMove(["11", "s", "5", "6", "T", "T", "YES"], ["11 s", "12 d"])
+        self.updateLists("T", "01 s", 5)
+
+        # Move & Update
+        self.calculateMove(["01", "s", "5", "2", "F", "T", "YES"], ["01 s"])
+        self.updateLists("T", "01 c", 5)
+
+        # Move & Update
+        self.calculateMove(["02", "s", "0", "2", "F", "T", "NO"], ["02 s", "01 s"])
+        self.updateLists("T", "NA", 0)
+
+        # Move & Update
+        self.calculateMove(["03", "h", "0", "1", "F", "T", "NO"], ["03 h", "02 h", "01 h"])
+        self.updateLists("T", "NA", 0)
+
+        # Move & Update
+        self.calculateMove(["01", "c", "5", "3", "F", "T", "YES"], ["01 c"])
+        self.updateLists("T", "10 s", 5)
+
+        # Move & Update
+        self.calculateMove(["10", "s", "5", "4", "T", "T", "NO"], ["10 s", "11 d", "12 c", "13 h"])
+        self.updateLists("W", "09 c", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "03 s", -1)
+
+        # Move & Update
+        self.calculateMove(["03", "s", "-1", "2", "F", "W", "YES"], ["03 s", "02 s", "01 s"])
+        self.updateLists("W", "02 c", -1)
+
+        # Move & Update
+        self.calculateMove(["02", "c", "-1", "3", "F", "W", "YES"], ["02 c", "01 c"])
+        self.updateLists("W", "04 s", -1)
+
+        # Move & Update
+        self.calculateMove(["04", "s", "-1", "2", "F", "W", "NO"], ["04 s", "03 s", "02 s", "01 s"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["05", "s", "2", "2", "F", "T", "NO"], ["05 s", "04 s", "03 s", "02 s", "01 s"])
+        self.updateLists("W", "NA", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "NO"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "NA", -1)
+
+    def calculateMove(self, trueMove, trueResult):
+        move = self.gl.calculate_move()
+        # Calculates the move
+        self.assertListEqual(move, trueMove)
+        # Updates the logic with regards to the move made
+        self.assertListEqual(self.gl.update_logic_move(move), trueResult)
+
+    def updateLists(self, whereTo, card, index):
+        if whereTo == "T":
+            taaa = (copy.deepcopy(self.gl.logicTableauCardPiles))
+            if card != "NA":
+                taaa.get(index).append(card)
+                if index == 0:
+                    tb = create_list([card], [], [], [], [], [], [])
+                if index == 1:
+                    tb = create_list([], [card], [], [], [], [], [])
+                if index == 2:
+                    tb = create_list([], [], [card], [], [], [], [])
+                if index == 3:
+                    tb = create_list([], [], [], [card], [], [], [])
+                if index == 4:
+                    tb = create_list([], [], [], [], [card], [], [])
+                if index == 5:
+                    tb = create_list([], [], [], [], [], [card], [])
+                if index == 6:
+                    tb = create_list([], [], [], [], [], [], [card])
+            else:
+                tb = create_list([], [], [], [], [], [], [])
+            _, taa, _ = self.gl.update_logic_scan(None, tb, None)
+            self.assertDictEqual(taa, taaa)
+        if whereTo == "W":
+            waaa = (copy.deepcopy(self.gl.logicWasteCard))
+            if card != "NA":
+                waaa.append(card)
+                wa = card
+            else:
+                wa = None
+            waa, _, _ = self.gl.update_logic_scan(wa, None, None)
+            self.assertListEqual(waa, waaa)
 
     def test_updateR_logic(self):
         self.insertVariables(0)
 
-        testWas, testTab, testFou = self.gl.updateLogicR([[]], self.createDummyList(0), self.createDummyList(-1))
+        testWas, testTab, testFou = self.gl.update_logic_scan([[]], self.createDummyList(0), self.createDummyList(-1))
         self.assertListEqual(testWas, [[]])
         self.assertDictEqual(testTab, self.logicTableauCardPiles)
         self.assertDictEqual(testFou, self.logicFoundationCardPiles)
 
-        testWas, testTab, testFou = self.gl.updateLogicR([["1", "h"], ["2", "c"]], self.createDummyList(0),
-                                                         self.createDummyList(-1))
+        testWas, testTab, testFou = self.gl.update_logic_scan([["1", "h"], ["2", "c"]], self.createDummyList(0),
+                                                              self.createDummyList(-1))
         self.assertListEqual(testWas, [[], ["1", "h"], ["2", "c"]])
         self.assertDictEqual(testTab, self.logicTableauCardPiles)
         self.assertDictEqual(testFou, self.logicFoundationCardPiles)
@@ -196,20 +415,20 @@ class TestGameLogic(TestCase):
         resultTest = testList.copy()
         resultTest[2] = ["2 d"]
 
-        self.assertDictEqual(self.gl.checkListConsistency(dummyList, testList), resultTest)
-        self.assertDictEqual(self.gl.checkListConsistency(empytyList, self.createDummyList(1)), dummyList)
+        self.assertDictEqual(self.gl.check_list_consistency(dummyList, testList), resultTest)
+        self.assertDictEqual(self.gl.check_list_consistency(empytyList, self.createDummyList(1)), dummyList)
 
     def test_reset_logic(self):
         self.insertVariables()
 
-        testWas, testTab, testFou = self.gl.resetLogic(None, None, None)
+        testWas, testTab, testFou = self.gl.reset_logic(None, None, None)
 
         self.assertIsNone(testWas)
         self.assertIsNone(testTab)
         self.assertIsNone(testFou)
 
-        testWas, testTab, testFou = self.gl.resetLogic([""], {0: ["a", "b", "c"], 1: ["a"]},
-                                                       {0: ["d", "e", "c"], 1: ["c"]})
+        testWas, testTab, testFou = self.gl.reset_logic([""], {0: ["a", "b", "c"], 1: ["a"]},
+                                                        {0: ["d", "e", "c"], 1: ["c"]})
 
         self.assertListEqual(testWas, [""])
         self.assertDictEqual(testTab, {0: ["a", "b", "c"], 1: ["a"]})
@@ -218,67 +437,68 @@ class TestGameLogic(TestCase):
     def test_calculate_move(self):
         self.insertVariables(0)
 
-        self.assertListEqual(self.gl.calculateMove(), ["5", "h", "2", "0", "T", "T", "YES"])
-        self.gl.updateLogicM(self.gl.calculateMove())
-        self.assertListEqual(self.gl.calculateMove(), ["1", "s", "4", "0", "F", "T", "YES"])
-        self.gl.updateLogicM(self.gl.calculateMove())
-        self.assertListEqual(self.gl.calculateMove(), ["13", "s", "5", "2", "T", "T", "YES"])
-        self.gl.updateLogicM(self.gl.calculateMove())
-        self.assertListEqual(self.gl.calculateMove(), ["3", "h", "6", "2", "F", "T", "YES"])
-        self.gl.updateLogicM(self.gl.calculateMove())
-        self.assertListEqual(self.gl.calculateMove(), ["1", "d", "-1", "1", "F", "W", "YES"])
-        self.gl.updateLogicM(self.gl.calculateMove())
+        self.assertListEqual(self.gl.calculate_move(), ["5", "h", "2", "0", "T", "T", "YES"])
+        self.gl.update_logic_move(self.gl.calculate_move())
+        self.assertListEqual(self.gl.calculate_move(), ["1", "s", "4", "0", "F", "T", "YES"])
+        self.gl.update_logic_move(self.gl.calculate_move())
+        self.assertListEqual(self.gl.calculate_move(), ["13", "s", "5", "2", "T", "T", "YES"])
+        self.gl.update_logic_move(self.gl.calculate_move())
+        self.assertListEqual(self.gl.calculate_move(), ["3", "h", "6", "2", "F", "T", "YES"])
+        self.gl.update_logic_move(self.gl.calculate_move())
+        self.assertListEqual(self.gl.calculate_move(), ["1", "d", "-1", "1", "F", "W", "YES"])
+        self.gl.update_logic_move(self.gl.calculate_move())
         self.gl.logicTableauCardPiles.get(5).clear()
         self.gl.logicTableauCardPiles.get(5).append("4 h")
-        self.assertListEqual(self.gl.calculateMove(), ["4", "h", "5", "2", "F", "T", "YES"])
-        self.gl.updateLogicM(self.gl.calculateMove())
+        self.assertListEqual(self.gl.calculate_move(), ["4", "h", "5", "2", "F", "T", "YES"])
+        self.gl.update_logic_move(self.gl.calculate_move())
         self.gl.logicWasteCard = [["12", "d"]]
-        self.assertListEqual(self.gl.calculateMove(), ["12", "d", "-1", "2", "T", "W", "YES"])
-        self.gl.updateLogicM(self.gl.calculateMove())
+        self.assertListEqual(self.gl.calculate_move(), ["12", "d", "-1", "2", "T", "W", "YES"])
+        self.gl.update_logic_move(self.gl.calculate_move())
         self.gl.logicFoundationCardPiles.clear()
         self.gl.logicFoundationCardPiles = {0: [], 1: [], 2: ["2 c"], 3: []}
-        self.assertListEqual(self.gl.calculateMove(), ["11", "s", "1", "2", "T", "T", "YES"])
-        self.gl.updateLogicM(self.gl.calculateMove())
+        self.assertListEqual(self.gl.calculate_move(), ["11", "s", "1", "2", "T", "T", "YES"])
+        self.gl.update_logic_move(self.gl.calculate_move())
         # SHOULD BE ERROR, PLS FIX
-        self.assertListEqual(self.gl.calculateMove(), ["12", "d", "2", "3", "T", "T", "NO"])
+        self.assertListEqual(self.gl.calculate_move(), ["12", "d", "2", "3", "T", "T", "NO"])
 
     def test_updateM_logic(self):
         self.insertVariables()
 
-        self.assertListEqual(self.gl.updateLogicM(["5", "h", "2", "0", "T", "T", "NO"]),
+        self.assertListEqual(self.gl.update_logic_move(["5", "h", "2", "0", "T", "T", "NO"]),
                              ["4 s", "5 h", "6 c", "7 d", "8 s"])
-        self.assertListEqual(self.gl.updateLogicM(self.gl.calculateMove()), ["1 s"])
-        self.assertListEqual(self.gl.updateLogicM(self.gl.calculateMove()), ["13 s"])
+        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["1 s"])
+        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["13 s"])
         self.gl.logicTableauCardPiles.get(5).clear()
         self.gl.logicTableauCardPiles.get(5).append("4 h")
-        self.assertListEqual(self.gl.updateLogicM(self.gl.calculateMove()), ["3 h", "2 h", "1 h"])
-        self.assertListEqual(self.gl.updateLogicM(self.gl.calculateMove()), ["4 h", "3 h", "2 h", "1 h"])
-        self.assertListEqual(self.gl.updateLogicM(self.gl.calculateMove()), ["1 d"])
+        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["3 h", "2 h", "1 h"])
+        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["4 h", "3 h", "2 h", "1 h"])
+        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["1 d"])
         self.gl.logicWasteCard.append(["12", "d"])
-        self.assertListEqual(self.gl.updateLogicM(["12", "d", "-1", "3", "T", "W", "YES"]), ["12 d", "13 c"])
+        self.assertListEqual(self.gl.update_logic_move(["12", "d", "-1", "3", "T", "W", "YES"]), ["12 d", "13 c"])
         self.gl.logicWasteCard.append(["11", "c"])
-        self.assertListEqual(self.gl.updateLogicM(self.gl.calculateMove()), ["11 s", "12 d", "13 c"])
+        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["11 s", "12 d", "13 c"])
         self.gl.logicTableauCardPiles.get(2).append("12 h")
-        self.assertListEqual(self.gl.updateLogicM(["12", "h", "2", "4", "T", "T", "NO"]), ["12 h", "13 s"])
-        self.assertListEqual(self.gl.updateLogicM(self.gl.calculateMove()), ["11 c", "12 h", "13 s"])
-        self.assertListEqual(self.gl.updateLogicM(self.gl.calculateMove()), ["NA", "NA", "NA", "NA", "NA"])
+        self.assertListEqual(self.gl.update_logic_move(["12", "h", "2", "4", "T", "T", "NO"]), ["12 h", "13 s"])
+        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["11 c", "12 h", "13 s"])
+        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["NA", "NA", "NA", "NA", "NA"])
 
     def test_check_card_placement(self):
         self.insertVariables()
 
-        self.assertTrue(self.gl.checkCardPlacement(-1, 5, "d", 0, 6, "c", False))
-        self.assertTrue(self.gl.checkCardPlacement(-1, 13, "c", 3, -1, "-1", False))
-        self.assertTrue(self.gl.checkCardPlacement(6, 3, "h", 2, -1, "-1", False))
-        self.assertFalse(self.gl.checkCardPlacement(6, 4, "h", 1, -1, "-1", False))
-        self.assertFalse(self.gl.checkCardPlacement(3, 11, "s", 5, 10, "s", False))
-        self.assertTrue(self.gl.checkCardPlacement(3, 11, "s", 5, 12, "d", False))
-        self.assertFalse(self.gl.checkCardPlacement(2, 7, "d", 1, 8, "d", False))
-        self.assertFalse(self.gl.checkCardPlacement(2, 7, "d", 1, 7, "d", False))
+        self.assertTrue(self.gl.check_card_placement(-1, 5, "d", 0, 6, "c", False))
+        self.assertTrue(self.gl.check_card_placement(-1, 13, "c", 3, -1, "-1", False))
+        self.assertTrue(self.gl.check_card_placement(6, 3, "h", 2, -1, "-1", False))
+        self.assertFalse(self.gl.check_card_placement(6, 4, "h", 1, -1, "-1", False))
+        self.assertFalse(self.gl.check_card_placement(3, 11, "s", 5, 10, "s", False))
+        self.assertTrue(self.gl.check_card_placement(3, 11, "s", 5, 12, "d", False))
+        self.assertFalse(self.gl.check_card_placement(2, 7, "d", 1, 8, "d", False))
+        self.assertFalse(self.gl.check_card_placement(2, 7, "d", 1, 7, "d", False))
 
     def test_check_foundation_card_pile(self):
         self.insertVariables(0)
 
-        self.assertEqual(self.gl.checkFoundationCardPile(3, "h"), 2)
-        self.assertEqual(self.gl.checkFoundationCardPile(1, "s"), 0)
-        self.assertEqual(self.gl.checkFoundationCardPile(6, "s"), -1)
-        self.assertEqual(self.gl.checkFoundationCardPile(3, "c"), -1)
+        self.assertEqual(self.gl.check_foundation_card_pile(3, "h"), 2)
+        self.assertEqual(self.gl.check_foundation_card_pile(1, "s"), 0)
+        self.assertEqual(self.gl.check_foundation_card_pile(6, "s"), -1)
+        self.assertEqual(self.gl.check_foundation_card_pile(3, "c"), -1)
+

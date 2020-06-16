@@ -6,11 +6,12 @@ class GameLogic:
         self.logicFoundationCardPiles = {}
         self.unknownWaste = 0
         self.unknownTableau = []
+        self.allUnknownWasteFound = False
         self.reset = True
         self.result = []
-        self.updateLogicR(logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles)
+        self.update_logic_scan(logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles)
 
-    def updateLogicR(self, logic_waste_card=None, logic_tableau_card_piles=None, logic_foundation_card_piles=None):
+    def update_logic_scan(self, logic_waste_card=None, logic_tableau_card_piles=None, logic_foundation_card_piles=None):
 
         # IF THE LISTS DO NOT EXIST OR IF THE RESET METHOD HAS BEEN CALLED, THE BELOW FUNCTION WILL RESET/INITIALIZE
         # THE OBJECT INSTANCE VARIABLES
@@ -32,26 +33,24 @@ class GameLogic:
         else:
 
             # UPDATING THE WASTE CARD
-            if logic_waste_card is not None and len(logic_waste_card) != 0:
-                if len(logic_waste_card) < len(self.logicWasteCard):
-                    self.logicWasteCard.pop(len(self.logicWasteCard) - 1)
-                elif len(logic_waste_card) > len(self.logicWasteCard):
-                    for i in range(len(logic_waste_card)):
-                        self.logicWasteCard.append(logic_waste_card[i])
-                else:
-                    self.logicWasteCard = logic_waste_card
+            if logic_waste_card is not None:
+                if logic_waste_card not in self.logicWasteCard:
+                    self.unknownWaste -= 1
+                    if self.unknownWaste == 0:
+                        self.allUnknownWasteFound = True
+                    self.logicWasteCard.append(logic_waste_card)
 
             # UPDATING THE TABLEAU LIST WITH THE NEW CARDS
             if logic_tableau_card_piles is not None:
-                self.checkListConsistency(logic_tableau_card_piles, self.logicTableauCardPiles)
+                self.check_list_consistency(logic_tableau_card_piles, self.logicTableauCardPiles)
 
             # UPDATING THE FOUNDATION LIST WITH THE NEW CARDS
             if logic_foundation_card_piles is not None:
-                self.checkListConsistency(logic_foundation_card_piles, self.logicFoundationCardPiles)
+                self.check_list_consistency(logic_foundation_card_piles, self.logicFoundationCardPiles)
 
         return self.logicWasteCard, self.logicTableauCardPiles, self.logicFoundationCardPiles
 
-    def checkListConsistency(self, list_one, list_two):
+    def check_list_consistency(self, list_one, list_two):
         for i in range(0, len(list_one)):
 
             if len(list_one.get(i)) != len(list_two.get(i)):
@@ -74,22 +73,23 @@ class GameLogic:
 
         return list_two
 
-    def resetLogic(self, logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles):
+    def reset_logic(self, logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles):
 
         # RESET METHOD TO RESTART THE GAME
         self.reset = True
-        return self.updateLogicR(logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles)
+        return self.update_logic_scan(logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles)
 
-    def updateLogicM(self, move):
+    def update_logic_move(self, move):
 
         # UPDATE LOGIC GLOBAL VARIABLES
         self.result = []
 
         # IF THERE WAS NO MOVE SPECIFIED, NOTHING CHANGES
-        if move != ["NA", "NA", "NA", "NA", "NA"]:
+        if move[0] != "NA":
 
             # DEFINE THE CARD BEING MOVED AND WHERE TO
             move_from_list = False
+
             moved_card = move[0] + " " + move[1]
             card_pile_moved_from = int(move[2])
             card_pile_moved_to = int(move[3])
@@ -99,11 +99,8 @@ class GameLogic:
 
             # UPDATE THE CARD PILE UNKNOWNS UNDER THE CARD BEING MOVED. THIS MEANS THE CARD SHOULD'VE BEEN SCANNED BY
             # NOW
-            if scan == "YES":
-                if move_type == "W":
-                    self.unknownWaste -= 1
-                else:
-                    self.unknownTableau[card_pile_moved_from] -= 1
+            if scan == "YES" and move_type == "T":
+                self.unknownTableau[card_pile_moved_from] -= 1
 
             # IF THE CARD SHOULD BE PLACED ON THE TABLEAU, WE ENTER THIS PART
             if card_placement == "T":
@@ -126,10 +123,10 @@ class GameLogic:
 
                 # IF IT'S A WASTE CARD, WE USE THE WASTE CARD STRING ARRAY
                 else:
-                    waste_card_array = self.logicWasteCard[len(self.logicWasteCard) - 1]
+                    _, _, waste_card = self.define_card(len(self.logicWasteCard) - 1, 0, "W")
                     self.logicTableauCardPiles.get(card_pile_moved_to).append \
-                        (waste_card_array[0] + " " + waste_card_array[1])
-                    self.logicWasteCard.remove(waste_card_array)
+                        (waste_card)
+                    self.logicWasteCard.remove(waste_card)
 
                 # SORTS THE PILE SO THAT THE SMALLEST NUMBER IS THE FIRST INDEX
                 self.logicTableauCardPiles.get(card_pile_moved_to).sort(reverse=False)
@@ -150,10 +147,10 @@ class GameLogic:
 
                 # IF IT'S A WASTE CARD, WE USE THE WASTE CARD STRING ARRAY
                 else:
-                    waste_card_array = self.logicWasteCard[len(self.logicWasteCard) - 1]
+                    _, _, waste_card = self.define_card(len(self.logicWasteCard) - 1, 0, "W")
                     self.logicFoundationCardPiles.get(card_pile_moved_to).append \
-                        (waste_card_array[0] + " " + waste_card_array[1])
-                    self.logicWasteCard.remove(waste_card_array)
+                        (waste_card)
+                    self.logicWasteCard.remove(waste_card)
 
                 # SORTS THE PILE SO THAT THE BIGGEST NUMBER IS THE FIRST INDEX
                 self.logicFoundationCardPiles.get(card_pile_moved_to).sort(reverse=True)
@@ -161,19 +158,18 @@ class GameLogic:
 
         return ["NA", "NA", "NA", "NA", "NA"]
 
-    def calculateMove(self):
+    def calculate_move(self):
 
         # FOR LOOP THAT ITERATES THROUGH EVERY PILE OF CARDS IN THE TABLEAU SECTION
         for i in range(len(self.logicTableauCardPiles)):
+
+            # CHECKS IF THERE ARE OTHER UNKNOWN CARDS UNDER THE CURRENT CARD
 
             # CHECK IF CURRENT PILE IS NOT EMPTY
             if len(self.logicTableauCardPiles.get(i)) > 0:
 
                 # DEFINE WHAT CARD NUMBER & TYPE THE CURRENT CARD IS
-                current_tableau_card_pile = self.logicTableauCardPiles.get(i)[0]
-                current_card_array = current_tableau_card_pile.split()
-                current_card_number = int(current_card_array[0])
-                current_card_type = current_card_array[1]
+                current_card_number, current_card_type, _ = self.define_card(i, 0, "T")
 
                 # FOR LOOP THAT ITERATES THROUGH EVERY NEIGHBOUR AND COMPARES IT TO THE CURRENT CARD
                 for j in range(len(self.logicTableauCardPiles)):
@@ -181,84 +177,73 @@ class GameLogic:
                     # CHECKS EMPTY SPACES ON FOUNDATION & TABLEAU, RETURNS A RESULT ARRAY IF A KING CAN BE PLACED ON ONE
                     # OF THEM
                     if len(self.logicTableauCardPiles.get(j)) == 0:
-                        if len(self.logicTableauCardPiles.get(i)) > 1 or self.unknownTableau[i] > 0:
-                            if self.checkCardPlacement(i, current_card_number, current_card_type, j, -1, "-1", False, self.unknownTableau[i], "T"):
+                        if len(self.logicTableauCardPiles.get(i)) > 1 or self.unknownTableau[i] != 0:
+                            if self.check_card_placement(i, current_card_number, current_card_type, j, -1, "-1", False, self.unknownTableau[i], "T"):
                                 return self.result
                             else:
-                                for k in range(len(self.logicTableauCardPiles.get(i)) - 1, 0, -1):
-
-                                    # DEFINE CURRENT SUB CARD IN THE CURRENT PILE
-                                    tableau_card_pile = self.logicTableauCardPiles.get(i)[k]
-                                    tableau_card_pile_array = tableau_card_pile.split()
-                                    tableau_card_pile_card_number = int(tableau_card_pile_array[0])
-                                    tableau_card_pile_card_type = tableau_card_pile_array[1]
-
-                                    if self.checkCardPlacement(i, tableau_card_pile_card_number, tableau_card_pile_card_type, j, -1, "-1", False, self.unknownTableau[i], "T"):
-                                        return self.result
+                                card_number, card_type, _ = self.define_card(i, len(self.logicTableauCardPiles.get(i)) - 1, "T")
+                                if card_number == 13:
+                                    if self.unknownTableau[i] != 0 and self.unknownTableau[j] == 0:
+                                        if self.check_card_placement(i, card_number, card_type, j, -1, "-1", True, self.unknownTableau[i], "T"):
+                                            return self.result
 
                     # IF WE DO NOT HAVE A KING, WE CHECK THE OTHER OPTIONS FOR ALL OTHER CARDS
                     else:
                         if self.logicTableauCardPiles.get(i)[0] != self.logicTableauCardPiles.get(j)[0]:
 
-                            # CHECKS IF THERE ARE OTHER UNKNOWN CARDS UNDER THE CURRENT CARD
-                            unknowns = self.unknownTableau[i]
-                            if len(self.logicTableauCardPiles.get(i)) > 1:
-                                unknowns = 0
-
                             # DEFINE WHAT CARD NUMBER & TYPE THE NEIGHBOR CARD IS
-                            next_tableau_card_pile = self.logicTableauCardPiles.get(j)[0]
-                            next_card_array = next_tableau_card_pile.split()
-                            next_card_number = int(next_card_array[0])
-                            next_card_type = next_card_array[1]
+                            next_card_number, next_card_type, _ = self.define_card(j, 0, "T")
 
                             if self.logicTableauCardPiles.get(i)[0] is not None:
                                 for k in range(len(self.logicTableauCardPiles.get(i)) - 1, 0, -1):
 
                                     # DEFINE CURRENT SUB CARD IN THE CURRENT PILE
-                                    tableau_card_pile = self.logicTableauCardPiles.get(i)[k]
-                                    tableau_card_pile_array = tableau_card_pile.split()
-                                    tableau_card_pile_card_number = int(tableau_card_pile_array[0])
-                                    tableau_card_pile_card_type = tableau_card_pile_array[1]
+                                    tableau_card_pile_card_number, tableau_card_pile_card_type, _ = self.define_card(i, k, "T")
 
-                                    # CHECK IF THERE ARE UNKNOWNS BENEATH PILE IF WE'RE MOVING THE WHOLE PILE
                                     if k == len(self.logicTableauCardPiles.get(i)) - 1:
                                         unknowns = self.unknownTableau[i]
+                                        if unknowns == 0:
+                                            unknowns = -1
                                     else:
-                                        unknowns = 0
+                                        unknowns = -1
+
+                                    if len(self.logicTableauCardPiles.get(i)) > 1 and k != len(self.logicTableauCardPiles.get(i)) - 1:
+                                        above_card_number, _, _ = self.define_card(i, k+1, "T")
+                                        if above_card_number != next_card_number:
+                                            if self.check_card_placement(i, tableau_card_pile_card_number, tableau_card_pile_card_type, j, next_card_number, next_card_type, True, unknowns, "T"):
+                                                return self.result
 
                                     # CHECKS WHETHER A SUB CARD IN A PILE CAN BE MOVED TO ANOTHER PILE SOMEWHERE ELSE
                                     # ON THE TABLEAU
+                                    else:
+                                        if self.check_card_placement(i, tableau_card_pile_card_number, tableau_card_pile_card_type, j, next_card_number, next_card_type, True, unknowns, "T"):
+                                            return self.result
 
-                                    if self.checkCardPlacement(i, tableau_card_pile_card_number, tableau_card_pile_card_type, j, next_card_number, next_card_type, True, unknowns, "T"):
-                                        return self.result
+                            unknowns = self.unknownTableau[i]
+                            if unknowns == 0:
+                                unknowns = -1
+                            if len(self.logicTableauCardPiles.get(i)) > 1:
+                                unknowns = -1
 
                             # PREVENTS THE LOGIC MAKING USELESS MOVES SUCH AS MOVING A CARD BETWEEN TWO PILES WITHOUT
                             # CHANGING ANYTHING, INSTEAD FOCUS ON THE NEXT CARD THAT COULD MAKE A DIFFERENCE IN THE GAME
                             if len(self.logicTableauCardPiles.get(i)) > 1:
-
-                                # DEFINE THE CURRENT SUB CARD AND ITS NEIGHBOR CARD
-                                curr_sub_pile = self.logicTableauCardPiles.get(i)[0]
-                                curr_sub_pile_array = curr_sub_pile.split()
-                                neigh_sub_pile = self.logicTableauCardPiles.get(j)[0]
-                                neigh_sub_pile_array = neigh_sub_pile.split()
-
-                                if int(curr_sub_pile_array[0]) + 1 != int(neigh_sub_pile_array[0]):
-                                    if self.checkCardPlacement(i, current_card_number, current_card_type, j, next_card_number, next_card_type, False, self.unknownTableau[i], "T"):
+                                above_card_number, _, _ = self.define_card(i, 1, "T")
+                                if above_card_number != next_card_number:
+                                    if self.check_card_placement(i, current_card_number, current_card_type, j, next_card_number, next_card_type, False, unknowns, "T"):
                                         return self.result
-
-                            # CHECKS IF A CARD ON TOP OF THE PILE CAN BE PLACED ANYWHERE IN THE FOUNDATION OR
-                            # NEIGHBOR TABLEAU PILE
-                            elif self.checkCardPlacement(i, current_card_number, current_card_type, j, next_card_number, next_card_type, False, unknowns, "T"):
-                                return self.result
+                            else:
+                                # CHECKS IF A CARD ON TOP OF THE PILE CAN BE PLACED ANYWHERE IN THE FOUNDATION OR
+                                # NEIGHBOR TABLEAU PILE
+                                if self.check_card_placement(i, current_card_number, current_card_type, j, next_card_number, next_card_type, False, unknowns, "T"):
+                                    return self.result
 
         # CHECKS IF THERE EXISTS A WASTE CARD
         if self.logicWasteCard is not None:
             if len(self.logicWasteCard) != 0:
 
                 # DEFINE WASTE CARD NUMBER AND TYPE
-                waste_card_array = self.logicWasteCard[len(self.logicWasteCard) - 1]
-                waste_card_number = int(waste_card_array[0])
-                waste_card_type = waste_card_array[1]
+                waste_card_number, waste_card_type, _ = self.define_card(len(self.logicWasteCard) - 1, 0, "W")
 
                 # ITERATE THROUGH CARD PILES TO SEE IF WASTE CARD CAN BE PLACED SOMEWHERE
                 for i in range(len(self.logicTableauCardPiles)):
@@ -266,24 +251,48 @@ class GameLogic:
                     if len(self.logicTableauCardPiles.get(i)) > 0:
 
                         # DEFINE NEIGHBOR CARDS
-                        next_tableau_card_pile = self.logicTableauCardPiles.get(i)[0]
-                        next_card_array = next_tableau_card_pile.split()
-                        next_card_number = int(next_card_array[0])
-                        next_card_type = next_card_array[1]
+                        next_card_number, next_card_type, _ = self.define_card(i, 0, "T")
+
+                        unknowns = self.unknownWaste
+                        if unknowns == 0:
+                            unknowns = -1
 
                         # CHECKS IF WASTE CARD CAN BE PLACED ON CURRENT PILE IN THE LIST
-                        if self.checkCardPlacement(-1, waste_card_number, waste_card_type, i, next_card_number,
-                                                   next_card_type,
-                                                   False, self.unknownWaste, "W"):
+                        if self.check_card_placement(-1, waste_card_number, waste_card_type, i, next_card_number, next_card_type, False, unknowns, "W"):
                             return self.result
 
-        return ["NA", "NA", "NA", "NA", "NA"]
+                    # CHECK IF IT'S A KING THAT CAN BE PLACED
+                    elif len(self.logicTableauCardPiles.get(i)) == 0 and waste_card_number == 13:
+                        if self.check_card_placement(-1, waste_card_number, waste_card_type, i, -1, "-1", False, self.unknownWaste, "W"):
+                            return self.result
+        if self.unknownWaste != 0:
+            return ["NA", "NA", "NA", "NA", "NA", "W", "YES"]
+        else:
+            return ["NA", "NA", "NA", "NA", "NA", "W", "NO"]
 
-    def checkCardPlacement(self, i, card_number, card_type, j, neighbor_card_number, neighbor_card_type, is_sub_card,
-                           unknowns=0, move_type=""):
+    def define_card(self, i, k, pile_type):
+        if pile_type == "T" or pile_type == "F":
+            if pile_type == "T":
+                card_pile = self.logicTableauCardPiles.get(i)[k]
+            else:
+                card_pile = self.logicFoundationCardPiles.get(i)[k]
+            current_card = card_pile.split()
+            current_card_number = int(current_card[0])
+            current_card_type = current_card[1]
+        else:
+            card_pile = self.logicWasteCard[i]
+            current_card = card_pile.split()
+            current_card_number = int(current_card[0])
+            current_card_type = current_card[1]
+        return current_card_number, current_card_type, card_pile
 
+    def check_card_placement(self, i, card_number, card_type, j, neighbor_card_number, neighbor_card_type, is_sub_card,
+                             unknowns=0, move_type=""):
+        card_number_string = str(card_number)
+        if card_number < 10:
+            card_number_string = "0" + card_number_string
         # IF UNKNOWNS IS ZERO, THAT MEANS THERE ARE NO OTHER CARDS BENEATH THE CURRENT CARD
-        if unknowns == 0:
+        if unknowns == -1:
             scan = "NO"
         else:
             scan = "YES"
@@ -294,11 +303,11 @@ class GameLogic:
             if not is_sub_card or (card_number == 13 and unknowns != 0):
 
                 # ITERATES THROUGH FOUNDATION PILES TO SEE IF CURRENT CARD CAN BE PLACED THERE
-                exists_in_foundation = self.checkFoundationCardPile(card_number, card_type)
+                exists_in_foundation = self.check_foundation_card_pile(card_number, card_type)
 
                 # IF IT CAN BE PLACED IN THE FOUNDATION, THE VALUE WILL BE BETWEEN 0-3
                 if exists_in_foundation > -1:
-                    self.result.append(str(card_number))
+                    self.result.append(card_number_string)
                     self.result.append(card_type)
                     self.result.append(str(i))
                     self.result.append(str(exists_in_foundation))
@@ -310,7 +319,7 @@ class GameLogic:
                 # THE -1 SPECIFIES IF THE LAST PILE WAS EMPTY AND IT ALSO CHECKS IF TRE CURRENT CARD IS A KING. IF IT
                 # IS, THEN WE CAN PLACE A KING THERE
                 elif neighbor_card_type == "-1" and neighbor_card_number == -1 and card_number == 13:
-                    self.result.append(str(card_number))
+                    self.result.append(card_number_string)
                     self.result.append(card_type)
                     self.result.append(str(i))
                     self.result.append(str(j))
@@ -332,7 +341,7 @@ class GameLogic:
                     # CHECKS IF THE NUMBER OF THE NEIGHBOUR CARD IS 1 HIGHER THAN THE CURRENT CARD. IF IT IS,
                     # WE CAN THEN PLACE THE CURRENT CARD ON THE NEIGHBOUR CARD
                     if neighbor_card_number - 1 == card_number:
-                        self.result.append(str(card_number))
+                        self.result.append(card_number_string)
                         self.result.append(card_type)
                         self.result.append(str(i))
                         self.result.append(str(j))
@@ -342,17 +351,15 @@ class GameLogic:
                         return True
         return False
 
-    def checkFoundationCardPile(self, card_number, card_type):
+    def check_foundation_card_pile(self, card_number, card_type):
 
         # ITERATES THROUGH THE FOUNDATION PILES
         for i in range(4):
             if len(self.logicFoundationCardPiles.get(i)) != 0:
 
                 # DEFINES THE CURRENT FOUNDATION CARD
-                foundation_card_pile = self.logicFoundationCardPiles.get(i)[0]
-                foundation_array = foundation_card_pile.split()
-                foundation_card_number = int(foundation_array[0])
-                foundation_card_type = foundation_array[1]
+                foundation_card_number, foundation_card_type, _ = self.define_card(i, 0, "F")
+
 
                 # IF CARD OF FOUNDATION AND THE CURRENT CARD TYPE MATCHES AND CURRENT CARD NUMBER IS 1 BIGGER THAN
                 # FOUNDATION, THEN WE CAN PLACE IT ON THIS FOUNDATION PILE
