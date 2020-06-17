@@ -90,7 +90,7 @@ class GameLogic:
 
         self.result = []
 
-        if move[0] != "NA":
+        if move[0] != "NA" and move[0] != "WIN":
 
             move_from_list = False
 

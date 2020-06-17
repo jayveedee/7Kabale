@@ -526,11 +526,14 @@ class TestGameLogic(TestCase):
         self.calculateMove(["13", "c", "3", "3", "F", "T", "NO"],
                            ["13 c", "12 c", "11 c", "10 c", "09 c", "08 c", "07 c", "06 c", "05 c", "04 c", "03 c", "02 c", "01 c"])
         self.updateLists("T", "NA", 3)
-
+        ["WIN", "WIN", "WIN", "WIN", "WIN", "WIN", "WIN"]
         # Move & Update
         self.calculateMove(["13", "h", "4", "1", "F", "T", "NO"],
                            ["13 h", "12 h", "11 h", "10 h", "09 h", "08 h", "07 h", "06 h", "05 h", "04 h", "03 h", "02 h", "01 h"])
         self.updateLists("T", "NA", 4)
+
+        self.calculateMove(["WIN", "WIN", "WIN", "WIN", "WIN", "WIN", "WIN"],
+                           ["NA", "NA", "NA", "NA", "NA"])
 
 
     def calculateMove(self, trueMove, trueResult):
