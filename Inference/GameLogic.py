@@ -9,6 +9,15 @@ def variable_check(card_number, unknowns):
     return card_number_string, scan
 
 
+def check_how_many_cards_to_move(move_from_list, moved_card, tableau_pile_moved_from, tableau_pile_moved_to):
+    for i in range(len(tableau_pile_moved_from) - 1, -1, -1):
+        if tableau_pile_moved_from[i] == moved_card:
+            move_from_list = True
+        if move_from_list:
+            tableau_pile_moved_to.append(tableau_pile_moved_from[i])
+            tableau_pile_moved_from.pop(i)
+
+
 class GameLogic:
 
     def __init__(self, logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles):
@@ -115,21 +124,13 @@ class GameLogic:
         tableau_pile_moved_to = self.logicTableauCardPiles.get(card_pile_moved_to)
         if card_pile_moved_from != -1:
             tableau_pile_moved_from = self.logicTableauCardPiles.get(card_pile_moved_from)
-            self.check_how_many_cards_to_move(move_from_list, moved_card, tableau_pile_moved_from, tableau_pile_moved_to)
+            check_how_many_cards_to_move(move_from_list, moved_card, tableau_pile_moved_from, tableau_pile_moved_to)
         else:
             waste_card = self.check_how_many_waste_found()
             tableau_pile_moved_to.append(waste_card)
             self.logicWasteCard.remove(waste_card)
         tableau_pile_moved_to.sort(reverse=False)
         return tableau_pile_moved_to
-
-    def check_how_many_cards_to_move(self, move_from_list, moved_card, tableau_pile_moved_from, tableau_pile_moved_to):
-        for i in range(len(tableau_pile_moved_from) - 1, -1, -1):
-            if tableau_pile_moved_from[i] == moved_card:
-                move_from_list = True
-            if move_from_list:
-                tableau_pile_moved_to.append(tableau_pile_moved_from[i])
-                tableau_pile_moved_from.pop(i)
 
     def handle_update_foundation_and_moved_pile(self, card_pile_moved_from, card_pile_moved_to, moved_card):
         foundation_pile_moved_to = self.logicFoundationCardPiles.get(card_pile_moved_to)
@@ -222,7 +223,7 @@ class GameLogic:
                                 if self.check_card_placement(i, current_card_number, current_card_type, j, next_card_number, next_card_type, False, unknowns, "T"):
                                     return self.result
 
-        return self.check_waste_card_placement(unknowns)
+        return self.check_waste_card_placement()
 
     def check_unknown_cards(self, i):
         if i != -1:
@@ -235,12 +236,13 @@ class GameLogic:
                 unknowns = -1
         return unknowns
 
-    def check_waste_card_placement(self, unknowns):
+    def check_waste_card_placement(self):
         if self.logicWasteCard is not None:
             if len(self.logicWasteCard) != 0:
                 if self.unknownWasteCounter != -1:
 
                     waste_card_number, waste_card_type = self.check_if_all_waste_cards_found()
+                    unknowns = self.check_unknown_cards(-1)
 
                     for i in range(len(self.logicTableauCardPiles)):
 
@@ -248,15 +250,11 @@ class GameLogic:
 
                             next_card_number, next_card_type, _ = self.define_card(i, 0, "T")
 
-                            unknowns = self.check_unknown_cards(-1)
-
-                            if self.check_card_placement(-1, waste_card_number, waste_card_type, i, next_card_number,
-                                                         next_card_type, False, unknowns, "W"):
+                            if self.check_card_placement(-1, waste_card_number, waste_card_type, i, next_card_number, next_card_type, False, unknowns, "W"):
                                 return self.result
 
                         elif len(self.logicTableauCardPiles.get(i)) == 0 and waste_card_number == 13:
-                            if self.check_card_placement(-1, waste_card_number, waste_card_type, i, -1, "-1", False,
-                                                         unknowns, "W"):
+                            if self.check_card_placement(-1, waste_card_number, waste_card_type, i, -1, "-1", False, unknowns, "W"):
                                 return self.result
         if self.unknownWaste != 0:
             return ["NA", "NA", "NA", "NA", "NA", "W", "YES"]
