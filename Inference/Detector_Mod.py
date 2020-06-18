@@ -62,6 +62,8 @@ def detect_card(some_prediction):
         list_of_piles_only_containing_newly_detected_cards[current_pile].append(card_name)
         # list_of_piles[current_pile].append(card_name)
 
+    print(list_of_piles)
+
     return
 
 
@@ -217,8 +219,6 @@ def done_scanning():
     move = game_logic.calculate_move()
     game_logic.update_logic_move(move)
     list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards = game_logic.get_piles()
-
-    print(list_of_waste_cards)
 
     update_card_piles(list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards)
 
