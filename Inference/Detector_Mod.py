@@ -48,19 +48,20 @@ current_pile = 0
 
 
 def detect_card(some_prediction):
+    # we assume that if there was unknown cards, then you have just scanned it. However, we should make a smarter way
+    # to detect if the unknown card has been scanned.
+    global there_are_unknown_cards
+    there_are_unknown_cards = False
+
     card_name = dictionaryOfIndexToName.get(some_prediction[4])
     dictionaryOfDetectedCards[card_name] = True
     dictionaryOfNewlyDiscoveredCards[card_name] = True
+    list_of_piles[current_pile].append(card_name)
 
     if not game_has_just_started:
         list_of_piles_only_containing_newly_detected_cards[current_pile].append(card_name)
+        # list_of_piles[current_pile].append(card_name)
 
-    # if the card is detected in the waste card pile, we split it to make it work with logic.
-    if current_pile == 11:
-        split_string_array = card_name.split()
-        list_of_piles[current_pile].append(split_string_array)
-    else:
-        list_of_piles[current_pile].append(card_name)
     return
 
 
@@ -84,15 +85,8 @@ def increment_card_viewed_counter(some_prediction):
 def show_detected_cards(some_image):
     list_of_detected_cards = "Cards: "
 
-    # see detect_card function for an explanation of why current_pile = 11 is unique.
-
     for some_name in list_of_piles[current_pile]:
-        if current_pile == 11:
-            list_of_detected_cards += some_name[0]
-            list_of_detected_cards += some_name[1]
-        else:
-            list_of_detected_cards += some_name
-
+        list_of_detected_cards += some_name
         list_of_detected_cards += " ,"
     cv2.putText(some_image, list_of_detected_cards, (0, 200), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
 
@@ -103,7 +97,7 @@ def show_detected_cards(some_image):
 def show_text(some_image, move):
     cv2.putText(some_image, "'ESC' to exit", (0, 30), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
 
-    if move is not None and move[0] is not "NA":
+    if move is not None and move[0] is not "NA" and not there_are_unknown_cards:
         cv2.putText(some_image, "'e' to confirm move", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
                     (209, 80, 0, 255), 2)
 
@@ -131,11 +125,15 @@ def show_text(some_image, move):
 def show_move(move, some_image):
     # Creating the text that will be displayed
     global move_text
+    global there_are_unknown_cards
+
     if game_has_just_started:
         move_text = "Scan first card of each pile"
+    elif there_are_unknown_cards:
+        move_text = "Flip and Scan the unknown card"
     else:
-        if move[0] == "NA" or move is None:
-            move_text = "No Valid move"
+        if move is None or move[0] == "NA":
+            move_text = "No Valid move. Take a card from the waste pile."
         else:
             card_number = move[0]
             card_suit = move[1]
@@ -146,7 +144,7 @@ def show_move(move, some_image):
             move_text = f"move {card_number}{card_suit} from pile {int(from_pile) + 1} to pile {int(to_pile) + 1} " \
                         f"in group {pile_group}"
 
-    print(move_text)
+    # print(move_text)
 
     # Calculating the coordinates and displaying the text
     text_size = cv2.getTextSize(move_text, cv2.FONT_HERSHEY_DUPLEX, .75, 2)[0]
@@ -174,14 +172,11 @@ def change_pile():
 
 def clear_current_pile():
     for card in list_of_piles[current_pile]:
-        if current_pile == 11:
-            card_name = card[0] + " " + card[1]
-            dictionaryOfDetectedCards[card_name] = False
-            dictionaryOfCardFrameCounter[card_name] = 0
-        else:
-            dictionaryOfDetectedCards[card] = False
-            dictionaryOfCardFrameCounter[card] = 0
+        dictionaryOfDetectedCards[card] = False
+        dictionaryOfNewlyDiscoveredCards[card] = False
+        dictionaryOfCardFrameCounter[card] = 0
 
+    list_of_piles_only_containing_newly_detected_cards[current_pile].clear()
     list_of_piles[current_pile].clear()
 
     return
@@ -201,18 +196,54 @@ def done_scanning():
     else:
         list_of_tableu_piles, list_of_foundation_piles, new_waste_cards \
             = make_separate_lists(list_of_piles_only_containing_newly_detected_cards)
-        game_logic.updateLogicR(new_waste_cards, list_of_tableu_piles, list_of_foundation_piles)
+
+        if len(new_waste_cards) != 0:
+            last_waste_card = new_waste_cards[len(new_waste_cards) - 1]
+            game_logic.update_logic_scan(last_waste_card, list_of_tableu_piles, list_of_foundation_piles)
+        else:
+            game_logic.update_logic_scan(None, list_of_tableu_piles, list_of_foundation_piles)
+
+        # game_logic.update_logic_scan(new_waste_cards, list_of_tableu_piles, list_of_foundation_piles)
+
+
 
         # We clear the lists of newly detected cards
         for pile in range(11):
             list_of_piles_only_containing_newly_detected_cards[pile].clear()
 
-    move = game_logic.calculateMove()
-    game_logic.updateLogicM(move)
+    move = game_logic.calculate_move()
+    game_logic.update_logic_move(move)
     list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards = game_logic.get_piles()
+
+    print(list_of_waste_cards)
+
     update_card_piles(list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards)
 
     return move
+
+
+# This function checks if the move tells us to flip cards
+def check_for_unknown_cards(move):
+    if move is None:
+        return False
+
+    there_is_an_unknown_card = False
+
+    if move[6] == "YES":
+        there_is_an_unknown_card = True
+
+    return there_is_an_unknown_card
+
+
+def check_for_win_condition(move):
+    if move is None:
+        return
+
+    if move[0] == "WIN":
+        global game_has_ended
+        print("You have won, closing now")
+        game_has_ended = True
+        return
 
 
 # This function is used to separate a list into 3 smaller lists of foundation, tableau and waste piles. This is used to
@@ -263,141 +294,102 @@ model_classes = os.path.join(model_folder, "data_classes.txt")
 
 anchors_path = os.path.join(src_path, "keras_yolo3", "model_data", "yolo_anchors.txt")
 
-FLAGS = None
+# define YOLO detector
+yolo = YOLO(
+    **{
+        "model_path": model_weights,
+        "anchors_path": anchors_path,
+        "classes_path": model_classes,
+        "score": 0.25,
+        "gpu_num": 1,
+        "model_image_size": (416, 416),
+    }
+)
 
-if __name__ == "__main__":
-    # Delete all default flags
-    parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
-    """
-    Command line options
-    """
+# labels to draw on images
+class_file = open(model_classes, "r")
+input_labels = [line.rstrip("\n") for line in class_file.readlines()]
+print("Found {} input labels: {} ...".format(len(input_labels), input_labels))
 
-    parser.add_argument(
-        "--yolo_model",
-        type=str,
-        dest="model_path",
-        default=model_weights,
-        help="Path to pre-trained weight files. Default is " + model_weights,
-    )
+game_has_ended = False
+game_has_just_started = True
+some_move = None
+is_confirming_move = False  # the confirming_move-state is when the player is doing the move physically.
+game_logic = None
+there_are_unknown_cards = False
 
-    parser.add_argument(
-        "--anchors",
-        type=str,
-        dest="anchors_path",
-        default=anchors_path,
-        help="Path to YOLO anchors. Default is " + anchors_path,
-    )
+while not game_has_ended:
+    # print(list_of_piles)
+    ret, img = video_stream.read()
+    final_image = img
+    if not is_confirming_move:
+        im_pil = Image.fromarray(img)
+        predictions, image = yolo.detect_image(im_pil, False)
+        # sort the predictions based on ymin
+        predictions.sort(key=lambda x: x[1], reverse=False)
 
-    parser.add_argument(
-        "--classes",
-        type=str,
-        dest="classes_path",
-        default=model_classes,
-        help="Path to YOLO class specifications. Default is " + model_classes,
-    )
+        desired_min_confidence_level = 0.25
+        list_of_certain_detections = []
 
-    parser.add_argument(
-        "--gpu_num", type=int, default=1, help="Number of GPU to use. Default is 1"
-    )
+        # removing all non certain predictions
+        for prediction in predictions:
+            if prediction[5] >= desired_min_confidence_level:
+                list_of_certain_detections.append(prediction)
 
-    parser.add_argument(
-        "--confidence",
-        type=float,
-        dest="score",
-        default=0.25,
-        help="Threshold for YOLO object confidence score to show predictions. Default is 0.25.",
-    )
+        # removing duplicates
+        list_of_detected_names = []
+        list_of_detections_without_duplicates = []
+        for prediction in list_of_certain_detections:
+            name = dictionaryOfIndexToName.get(prediction[4])
+            if name not in list_of_detected_names:
+                list_of_detected_names.append(name)
+                list_of_detections_without_duplicates.append(prediction)
 
-    FLAGS = parser.parse_args()
+        # incrementing the count of each card seen in succession from frame to frame
+        for prediction in list_of_detections_without_duplicates:
+            increment_card_viewed_counter(prediction)
 
-    # define YOLO detector
-    yolo = YOLO(
-        **{
-            "model_path": FLAGS.model_path,
-            "anchors_path": FLAGS.anchors_path,
-            "classes_path": FLAGS.classes_path,
-            "score": FLAGS.score,
-            "gpu_num": FLAGS.gpu_num,
-            "model_image_size": (416, 416),
-        }
-    )
-
-    # labels to draw on images
-    class_file = open(FLAGS.classes_path, "r")
-    input_labels = [line.rstrip("\n") for line in class_file.readlines()]
-    print("Found {} input labels: {} ...".format(len(input_labels), input_labels))
-
-    game_has_ended = False
-    game_has_just_started = True
-    some_move = None
-    is_confirming_move = False  # the confirming_move-state is when the player is doing the move physically.
-    game_logic = None
-
-    while not game_has_ended:
-        print(list_of_piles)
-        ret, img = video_stream.read()
-        final_image = img
-        if not is_confirming_move:
-            im_pil = Image.fromarray(img)
-            predictions, image = yolo.detect_image(im_pil, False)
-            # sort the predictions based on ymin
-            predictions.sort(key=lambda x: x[1], reverse=False)
-
-            desired_min_confidence_level = 0.25
-            list_of_certain_detections = []
-
-            # removing all non certain predictions
-            for prediction in predictions:
-                if prediction[5] >= desired_min_confidence_level:
-                    list_of_certain_detections.append(prediction)
-
-            # removing duplicates
-            list_of_detected_names = []
-            list_of_detections_without_duplicates = []
-            for prediction in list_of_certain_detections:
-                name = dictionaryOfIndexToName.get(prediction[4])
-                if name not in list_of_detected_names:
-                    list_of_detected_names.append(name)
-                    list_of_detections_without_duplicates.append(prediction)
-
-            # incrementing the count of each card seen in succession from frame to frame
+        # resetting the count for all the cards that has not been detected this frame
+        for key, value in dictionaryOfCardFrameCounter.items():
+            found_card = False
             for prediction in list_of_detections_without_duplicates:
-                increment_card_viewed_counter(prediction)
+                prediction_name = dictionaryOfIndexToName.get(prediction[4])
+                if key == prediction_name:
+                    found_card = True
+                    continue
+            if not found_card:
+                dictionaryOfCardFrameCounter[key] = 0
 
-            # resetting the count for all the cards that has not been detected this frame
-            for key, value in dictionaryOfCardFrameCounter.items():
-                found_card = False
-                for prediction in list_of_detections_without_duplicates:
-                    prediction_name = dictionaryOfIndexToName.get(prediction[4])
-                    if key == prediction_name:
-                        found_card = True
-                        continue
-                if not found_card:
-                    dictionaryOfCardFrameCounter[key] = 0
+        opencv_image = np.asarray(image)
+        final_image = opencv_image
 
-            opencv_image = np.asarray(image)
-            final_image = opencv_image
-
-        k = cv2.waitKey(30) & 0xff
-        if k == 27:  # When 'ESC' is pressed, we exit.
-            break
-        if k == 99 and not is_confirming_move:  # When 'c' is pressed we clear current pile
-            clear_current_pile()
-        if k == 32 and not is_confirming_move:  # When 'SPACE' is pressed we change pile
-            change_pile()
-        if k == 101:  # When 'e' is pressed, we stop scanning or confirm move
-            if not is_confirming_move:
+    k = cv2.waitKey(30) & 0xff
+    if k == 27:  # When 'ESC' is pressed, we exit.
+        break
+    if k == 99 and not is_confirming_move:  # When 'c' is pressed we clear current pile
+        clear_current_pile()
+    if k == 32 and not is_confirming_move:  # When 'SPACE' is pressed we change pile
+        change_pile()
+    if k == 101:  # When 'e' is pressed, we stop scanning or confirm move
+        if not is_confirming_move:
+            if not there_are_unknown_cards:
                 some_move = done_scanning()
                 if some_move[0] != "NA":
                     is_confirming_move = True
+        else:
+            if check_for_unknown_cards(some_move):
+                is_confirming_move = False
+                some_move = None
+                there_are_unknown_cards = True
             else:
                 some_move = done_scanning()
                 if some_move[0] == "NA":
                     is_confirming_move = False
 
-        show_text(final_image, some_move)
-        cv2.imshow('img', final_image)
+    check_for_win_condition(some_move)
+    show_text(final_image, some_move)
+    cv2.imshow('img', final_image)
 
-    cv2.destroyAllWindows()
-    video_stream.release()
-    yolo.close_session()
+cv2.destroyAllWindows()
+video_stream.release()
+yolo.close_session()

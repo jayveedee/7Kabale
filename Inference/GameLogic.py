@@ -355,3 +355,6 @@ class GameLogic:
     def reset_logic(self, logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles):
         self.reset = True
         return self.update_logic_scan(logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles)
+
+    def get_piles(self):
+        return self.logicTableauCardPiles, self.logicFoundationCardPiles, self.logicWasteCard
