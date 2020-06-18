@@ -526,7 +526,7 @@ class TestGameLogic(TestCase):
         self.calculateMove(["13", "c", "3", "3", "F", "T", "NO"],
                            ["13 c", "12 c", "11 c", "10 c", "09 c", "08 c", "07 c", "06 c", "05 c", "04 c", "03 c", "02 c", "01 c"])
         self.updateLists("T", "NA", 3)
-        ["WIN", "WIN", "WIN", "WIN", "WIN", "WIN", "WIN"]
+
         # Move & Update
         self.calculateMove(["13", "h", "4", "1", "F", "T", "NO"],
                            ["13 h", "12 h", "11 h", "10 h", "09 h", "08 h", "07 h", "06 h", "05 h", "04 h", "03 h", "02 h", "01 h"])
@@ -534,7 +534,6 @@ class TestGameLogic(TestCase):
 
         self.calculateMove(["WIN", "WIN", "WIN", "WIN", "WIN", "WIN", "WIN"],
                            ["NA", "NA", "NA", "NA", "NA"])
-
 
     def calculateMove(self, trueMove, trueResult):
         move = self.gl.calculate_move()
@@ -567,7 +566,7 @@ class TestGameLogic(TestCase):
             _, taa, _ = self.gl.update_logic_scan(None, tb, None)
             self.assertDictEqual(taa, taaa)
         if whereTo == "W":
-            waaa = (copy.deepcopy(self.gl.logicWasteCard))
+            waaa = (copy.deepcopy(self.gl.logicWasteCardPile))
             if card != "NA":
                 waaa.append(card)
                 wa = card
@@ -618,7 +617,9 @@ class TestGameLogic(TestCase):
         self.assertDictEqual(testFou, {0: ["d", "e", "c"], 1: ["c"]})
 
     def test_calculate_move(self):
-        self.insertVariables(0)
+        self.insertVariables(2)
+
+        self.gl.calculate_move()
 
         self.assertListEqual(self.gl.calculate_move(), ["5", "h", "2", "0", "T", "T", "YES"])
         self.gl.update_logic_move(self.gl.calculate_move())
@@ -634,7 +635,7 @@ class TestGameLogic(TestCase):
         self.gl.logicTableauCardPiles.get(5).append("4 h")
         self.assertListEqual(self.gl.calculate_move(), ["4", "h", "5", "2", "F", "T", "YES"])
         self.gl.update_logic_move(self.gl.calculate_move())
-        self.gl.logicWasteCard = [["12", "d"]]
+        self.gl.logicWasteCardPile = [["12", "d"]]
         self.assertListEqual(self.gl.calculate_move(), ["12", "d", "-1", "2", "T", "W", "YES"])
         self.gl.update_logic_move(self.gl.calculate_move())
         self.gl.logicFoundationCardPiles.clear()
@@ -656,9 +657,9 @@ class TestGameLogic(TestCase):
         self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["03 h", "02 h", "01 h"])
         self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["04 h", "03 h", "02 h", "01 h"])
         self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["01 d"])
-        self.gl.logicWasteCard.append(["12", "d"])
+        self.gl.logicWasteCardPile.append(["12", "d"])
         self.assertListEqual(self.gl.update_logic_move(["12", "d", "-1", "3", "T", "W", "YES"]), ["12 d", "13 c"])
-        self.gl.logicWasteCard.append(["11", "c"])
+        self.gl.logicWasteCardPile.append(["11", "c"])
         self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["11 s", "12 d", "13 c"])
         self.gl.logicTableauCardPiles.get(2).append("12 h")
         self.assertListEqual(self.gl.update_logic_move(["12", "h", "2", "4", "T", "T", "NO"]), ["12 h", "13 s"])
@@ -686,8 +687,8 @@ class TestGameLogic(TestCase):
         self.assertEqual(self.gl.check_foundation_card_pile(3, "c"), -1)
 
     def insertVariables(self, testNumber=0):
-        self.logicWasteCard = [[]]
-        self.logicWasteCard[0] = ["01", "d"]
+        self.logicWasteCard = []
+        self.logicWasteCard.append("01 d")
 
         list0 = []
         list00 = []
@@ -718,7 +719,7 @@ class TestGameLogic(TestCase):
             list111111.append("13 s")
             list111111.append("12 unknown")
             list1111111.append("03 h")
-        else:
+        if testNumber == 1:
             list1.append("06 c")
             list11.append("11 s")
             list111.append("04 s")
@@ -726,6 +727,11 @@ class TestGameLogic(TestCase):
             list11111.append("01 s")
             list111111.append("13 s")
             list1111111.append("03 h")
+
+        if testNumber == 2:
+            list1.append("12 h")
+            list1.append("13 c")
+            list11.append("13 s")
 
         self.logicTableauCardPiles = {0: list1, 1: list11, 2: list111, 3: list1111, 4: list11111, 5: list111111,
                                       6: list1111111}
