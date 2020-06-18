@@ -50,8 +50,8 @@ current_pile = 0
 def detect_card(some_prediction):
     # we assume that if there was unknown cards, then you have just scanned it. However, we should make a smarter way
     # to detect if the unknown card has been scanned.
-    global there_are_unknown_cards
-    there_are_unknown_cards = False
+    # global there_are_unknown_cards
+    # there_are_unknown_cards = False
 
     card_name = dictionaryOfIndexToName.get(some_prediction[4])
     dictionaryOfDetectedCards[card_name] = True
@@ -97,10 +97,13 @@ def show_detected_cards(some_image):
 def show_text(some_image, move):
     cv2.putText(some_image, "'ESC' to exit", (0, 30), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
 
-    if move is not None and move[0] is not "NA" and not there_are_unknown_cards:
+    """if move is not None and move[0] is not "NA" and not there_are_unknown_cards:
+        cv2.putText(some_image, "'e' to confirm move", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
+                    (209, 80, 0, 255), 2)"""
+
+    if move is not None and move[0] is not "NA":
         cv2.putText(some_image, "'e' to confirm move", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
                     (209, 80, 0, 255), 2)
-
     else:
         cv2.putText(some_image, "'c' to clear current pile", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
                     (209, 80, 0, 255), 2)
@@ -125,12 +128,12 @@ def show_text(some_image, move):
 def show_move(move, some_image):
     # Creating the text that will be displayed
     global move_text
-    global there_are_unknown_cards
+    # global there_are_unknown_cards
 
+    """elif there_are_unknown_cards:
+        move_text = "Flip and Scan the unknown card"""""
     if game_has_just_started:
         move_text = "Scan first card of each pile"
-    elif there_are_unknown_cards:
-        move_text = "Flip and Scan the unknown card"
     else:
         if move is None or move[0] == "NA":
             move_text = "No Valid move. Take a card from the waste pile."
@@ -316,7 +319,7 @@ game_has_just_started = True
 some_move = None
 is_confirming_move = False  # the confirming_move-state is when the player is doing the move physically.
 game_logic = None
-there_are_unknown_cards = False
+# there_are_unknown_cards = False
 
 while not game_has_ended:
     # print(list_of_piles)
@@ -371,7 +374,7 @@ while not game_has_ended:
     if k == 32 and not is_confirming_move:  # When 'SPACE' is pressed we change pile
         change_pile()
     if k == 101:  # When 'e' is pressed, we stop scanning or confirm move
-        if not is_confirming_move:
+        """if not is_confirming_move:
             if not there_are_unknown_cards:
                 some_move = done_scanning()
                 if some_move[0] != "NA":
@@ -384,7 +387,16 @@ while not game_has_ended:
             else:
                 some_move = done_scanning()
                 if some_move[0] == "NA":
-                    is_confirming_move = False
+                    is_confirming_move = False"""
+
+        if not is_confirming_move:
+            some_move = done_scanning()
+            if some_move[0] != "NA":
+                is_confirming_move = True
+        else:
+            some_move = done_scanning()
+            if some_move[0] == "NA":
+                is_confirming_move = False
 
     check_for_win_condition(some_move)
     show_text(final_image, some_move)
