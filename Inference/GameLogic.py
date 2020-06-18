@@ -319,14 +319,11 @@ class GameLogic:
                 card_pile = self.logicTableauCardPiles.get(i)[k]
             else:
                 card_pile = self.logicFoundationCardPiles.get(i)[k]
-            current_card = card_pile.split()
-            current_card_number = int(current_card[0])
-            current_card_type = current_card[1]
         else:
             card_pile = self.logicWasteCardPile[i]
-            current_card = card_pile.split()
-            current_card_number = int(current_card[0])
-            current_card_type = current_card[1]
+        current_card = card_pile.split()
+        current_card_number = int(current_card[0])
+        current_card_type = current_card[1]
         return current_card_number, current_card_type, card_pile
 
     def create_move(self, card_number_string, card_type, i, j, move_from, move_type, scan):
