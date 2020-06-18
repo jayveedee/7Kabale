@@ -729,9 +729,8 @@ class TestGameLogic(TestCase):
             list1111111.append("03 h")
 
         if testNumber == 2:
-            list1.append("12 h")
-            list1.append("13 c")
-            list11.append("13 s")
+            list1.append("13 h")
+            list111.append("13 s")
 
         self.logicTableauCardPiles = {0: list1, 1: list11, 2: list111, 3: list1111, 4: list11111, 5: list111111,
                                       6: list1111111}

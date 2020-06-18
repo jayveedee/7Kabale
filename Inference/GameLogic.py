@@ -160,14 +160,15 @@ class GameLogic:
 
     def check_empty_spaces(self, card_number, card_type, current_pile, i, j, neighbor_pile, unknowns):
         if len(neighbor_pile) == 0:
-            if self.check_card_placement(i, card_number, card_type, j, -1, "-1", False, unknowns, "T"):
-                return "King"
-            last_index = len(current_pile) - 1
-            if current_pile[last_index] == "13 d" or current_pile[last_index] == "13 c" or \
-                    current_pile[last_index] == "13 s" or current_pile[last_index] == "13 h":
-                king_card_number, king_card_type, _ = self.define_card(i, last_index, "T")
-                if self.check_card_placement(i, king_card_number, king_card_type, j, -1, "-1", True, unknowns, "T"):
+            if self.unknownTableau[j] == 0:
+                if self.check_card_placement(i, card_number, card_type, j, -1, "-1", False, unknowns, "T"):
                     return "King"
+                last_index = len(current_pile) - 1
+                if current_pile[last_index] == "13 d" or current_pile[last_index] == "13 c" or \
+                        current_pile[last_index] == "13 s" or current_pile[last_index] == "13 h":
+                    king_card_number, king_card_type, _ = self.define_card(i, last_index, "T")
+                    if self.check_card_placement(i, king_card_number, king_card_type, j, -1, "-1", True, unknowns, "T"):
+                        return "King"
             return True
         else:
             return False
