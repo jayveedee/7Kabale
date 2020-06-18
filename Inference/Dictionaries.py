@@ -12,8 +12,26 @@ foundation_pile_3 = []
 foundation_pile_4 = []
 waste_pile = []
 
+tableau_pile_1_new = []
+tableau_pile_2_new = []
+tableau_pile_3_new = []
+tableau_pile_4_new = []
+tableau_pile_5_new = []
+tableau_pile_6_new = []
+tableau_pile_7_new = []
+foundation_pile_1_new = []
+foundation_pile_2_new = []
+foundation_pile_3_new = []
+foundation_pile_4_new = []
+waste_pile_new = []
+
 list_of_piles = [tableau_pile_1, tableau_pile_2, tableau_pile_3, tableau_pile_4, tableau_pile_5, tableau_pile_6,
                  tableau_pile_7, foundation_pile_1, foundation_pile_2, foundation_pile_3, foundation_pile_4, waste_pile]
+
+list_of_piles_only_containing_newly_detected_cards = [tableau_pile_1_new, tableau_pile_2_new,
+                                                      tableau_pile_3_new, tableau_pile_4_new, tableau_pile_5_new, tableau_pile_6_new,
+                                                      tableau_pile_7_new, foundation_pile_1_new, foundation_pile_2_new,
+                                                      foundation_pile_3_new, foundation_pile_4_new, waste_pile_new]
 
 dictionary_of_piles = {
     0: tableau_pile_1,
@@ -206,6 +224,61 @@ dictionaryOfDetectedCards = {
     "3 s": False,
     "1 s": False,
     "10 d": False,
+    "8 h": False,
+    "6 s": False,
+    "11 s": False,
+    "3 d": False,
+    "1 h": False
+}
+
+dictionaryOfNewlyDiscoveredCards = {
+    "8 c": False,
+    "13 s": False,
+    "5 c": False,
+    "12 h": False,
+    "7 s": False,
+    "11 h": False,
+    "2 c": False,
+    "7 h": False,
+    "1 d": False,
+    "2 h": False,
+    "11 c": False,
+    "6 d": False,
+    "4 h": False,
+    "7 d": False,
+    "12 c": False,
+    "4 s": False,
+    "8 d": False,
+    "5 h": False,
+    "6 c": False,
+    "5 d": False,
+    "7 c": False,
+    "3 h": False,
+    "1False h": False,
+    "13 d": False,
+    "6 h": False,
+    "9 d": False,
+    "8 s": False,
+    "9 c": False,
+    "3 c": False,
+    "2 s": False,
+    "1False s": False,
+    "9 h": False,
+    "4 c": False,
+    "13 c": False,
+    "12 d": False,
+    "4 d": False,
+    "5 s": False,
+    "1False c": False,
+    "9 s": False,
+    "13 h": False,
+    "12 s": False,
+    "2 d": False,
+    "11 d": False,
+    "1 c": False,
+    "3 s": False,
+    "1 s": False,
+    "1False d": False,
     "8 h": False,
     "6 s": False,
     "11 s": False,

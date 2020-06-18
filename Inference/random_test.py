@@ -1,7 +1,17 @@
-list_of_foundation_piles = {7: [],
-                                8: [],
-                                9: [],
-                                10: []}
+tableau_pile_1 = []
+tableau_pile_2 = []
+tableau_pile_3 = []
+tableau_pile_4 = []
+tableau_pile_5 = []
+tableau_pile_6 = []
+tableau_pile_7 = []
+foundation_pile_1 = []
+foundation_pile_2 = []
+foundation_pile_3 = []
+foundation_pile_4 = []
+waste_pile = []
 
-for key, value in list_of_foundation_piles.items():
-    print(len(value))
+list_of_piles_only_containing_newly_detected_cards = [tableau_pile_1, tableau_pile_2,
+                                                      tableau_pile_3, tableau_pile_4, tableau_pile_5, tableau_pile_6,
+                                                      tableau_pile_7, foundation_pile_1, foundation_pile_2,
+                                                      foundation_pile_3, foundation_pile_4, waste_pile]

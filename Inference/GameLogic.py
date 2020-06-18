@@ -208,7 +208,8 @@ class GameLogic:
             if len(self.logicWasteCard) != 0:
 
                 # DEFINE WASTE CARD NUMBER AND TYPE
-                wasteCardArray = self.logicWasteCard[len(self.logicWasteCard) - 1]
+                wasteCardTableauPile = self.logicWasteCard[len(self.logicWasteCard) - 1]
+                wasteCardArray = wasteCardTableauPile.split()
                 wasteCardNumber = int(wasteCardArray[0])
                 wasteCardType = wasteCardArray[1]
 
@@ -303,3 +304,6 @@ class GameLogic:
 
         # IF THE CARD CANNOT BE PLACED ON THE FOUNDATION PILES, RETURN -1
         return -1
+
+    def get_piles(self):
+        return self.logicTableauCardPiles, self.logicFoundationCardPiles, self.logicWasteCard
