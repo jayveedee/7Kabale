@@ -35,6 +35,7 @@ import GameLogic
 from keras_yolo3.yolo import YOLO
 from PIL import Image
 import numpy as np
+import copy
 
 move_text = ""
 list_of_piles = Dictionaries.list_of_piles
@@ -318,10 +319,10 @@ def update_card_piles(tableu_piles, foundation_piles, waste_cards):
     global list_of_piles
     for pile in range(11):
         if pile > 6:
-            list_of_piles[pile] = foundation_piles[pile-7]
+            list_of_piles[pile] = copy.deepcopy(foundation_piles[pile-7])
         else:
-            list_of_piles[pile] = tableu_piles[pile]
-        list_of_piles[11] = waste_cards
+            list_of_piles[pile] = copy.deepcopy(tableu_piles[pile])
+        list_of_piles[11] = copy.deepcopy(waste_cards)
 
     print("this is all the piles in this part after getting the piles from logic:")
     print(list_of_piles)

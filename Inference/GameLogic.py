@@ -1,3 +1,5 @@
+counter = 0
+
 def variable_check(card_number, unknowns):
     card_number_string = str(card_number)
     if card_number < 10:
@@ -38,7 +40,7 @@ class GameLogic:
             self.logicWasteCardPile = logic_waste_card
             self.logicTableauCardPiles = logic_tableau_card_piles
             self.logicFoundationCardPiles = logic_foundation_card_piles
-            self.unknownWaste = 23
+            self.unknownWaste = 24
             for i in range(7):
                 counter = 0
                 for j in range(i):
@@ -49,6 +51,7 @@ class GameLogic:
         else:
             if logic_waste_card is not None:
                 if logic_waste_card not in self.logicWasteCardPile:
+                    self.increment_counter()
                     self.unknownWaste -= 1
                     if self.unknownWaste == 0:
                         self.allUnknownWasteFound = True
@@ -369,3 +372,11 @@ class GameLogic:
 
     def get_unknown_counter(self):
         return self.unknownWaste
+
+    def increment_counter(self):
+        global counter
+        counter += 1
+
+    def get_counter(self):
+        global counter
+        return counter
