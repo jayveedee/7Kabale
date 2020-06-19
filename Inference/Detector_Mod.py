@@ -62,8 +62,6 @@ def detect_card(some_prediction):
         list_of_piles_only_containing_newly_detected_cards[current_pile].append(card_name)
         # list_of_piles[current_pile].append(card_name)
 
-    print(list_of_piles)
-
     return
 
 
@@ -186,8 +184,18 @@ def clear_current_pile():
 
     return
 
+def sortLists(some_tableu_piles, some_foundation_piles, some_waste_cards):
+
+    for some_key, pile in some_tableu_piles.items():
+        pile.sort(reverse=False)
+    for some_key, pile in some_foundation_piles.items():
+        pile.sort(reverse=True)
+
+    return some_tableu_piles, some_foundation_piles, some_waste_cards
 
 def done_scanning():
+    print("I am running!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
     global game_has_just_started
     global game_logic
     global list_of_piles
@@ -195,32 +203,65 @@ def done_scanning():
     # send data to Logic
     list_of_tableu_piles, list_of_foundation_piles, waste_cards = make_separate_lists(list_of_piles)
 
+    list_of_tableu_piles, list_of_foundation_piles, waste_cards = sortLists(list_of_tableu_piles, list_of_foundation_piles, waste_cards)
+
     if game_has_just_started:
         game_has_just_started = False
+        print("********************************************************")
+        print("Sending the following to logic:")
+        print(f"Tableu_piles: {list_of_tableu_piles}")
+        print(f"Foundation_piles: {list_of_foundation_piles}")
+        print(f"waste_cards: {waste_cards}")
+        print(" ")
         game_logic = GameLogic.GameLogic(waste_cards, list_of_tableu_piles, list_of_foundation_piles)
     else:
         list_of_tableu_piles, list_of_foundation_piles, new_waste_cards \
             = make_separate_lists(list_of_piles_only_containing_newly_detected_cards)
 
+        list_of_tableu_piles, list_of_foundation_piles, new_waste_cards \
+            = sortLists(list_of_tableu_piles, list_of_foundation_piles, new_waste_cards)
+
         if len(new_waste_cards) != 0:
             last_waste_card = new_waste_cards[len(new_waste_cards) - 1]
             game_logic.update_logic_scan(last_waste_card, list_of_tableu_piles, list_of_foundation_piles)
+            print("********************************************************")
+            print("Sending the following to logic:")
+            print(f"Tableu_piles: {list_of_tableu_piles}")
+            print(f"Foundation_piles: {list_of_foundation_piles}")
+            print(f"waste_cards: {last_waste_card}")
+            print(" ")
         else:
             game_logic.update_logic_scan(None, list_of_tableu_piles, list_of_foundation_piles)
+            print("********************************************************")
+            print("Sending the following to logic:")
+            print(f"Tableu_piles: {list_of_tableu_piles}")
+            print(f"Foundation_piles: {list_of_foundation_piles}")
+            print(f"waste_cards: None")
+            print(" ")
+
 
         # game_logic.update_logic_scan(new_waste_cards, list_of_tableu_piles, list_of_foundation_piles)
 
 
 
         # We clear the lists of newly detected cards
-        for pile in range(11):
+        for pile in range(12):
             list_of_piles_only_containing_newly_detected_cards[pile].clear()
 
     move = game_logic.calculate_move()
     game_logic.update_logic_move(move)
     list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards = game_logic.get_piles()
 
+    print("Getting the following piles from logic:")
+    print(f"Tableu_piles: {list_of_tableu_piles}")
+    print(f"Foundation_piles: {list_of_foundation_piles}")
+    print(f"waste_cards: {list_of_waste_cards}")
+    print(" ")
+
     update_card_piles(list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards)
+    counter = game_logic.get_unknown_counter()
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print(counter)
 
     return move
 
@@ -281,6 +322,12 @@ def update_card_piles(tableu_piles, foundation_piles, waste_cards):
         else:
             list_of_piles[pile] = tableu_piles[pile]
         list_of_piles[11] = waste_cards
+
+    print("this is all the piles in this part after getting the piles from logic:")
+    print(list_of_piles)
+    print(" ")
+    print("************************************************************************")
+
     return
 
 
