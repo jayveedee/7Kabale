@@ -214,6 +214,10 @@ class TestGameLogic(TestCase):
 
         # Move & Update
         self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
+        self.updateLists("W", "07 c", -1)
+
+        # Move & Update
+        self.calculateMove(["NA", "NA", "NA", "NA", "NA", "W", "YES"], ["NA", "NA", "NA", "NA", "NA"])
         self.updateLists("W", "05 d", -1)
 
         # Move & Update
@@ -568,7 +572,8 @@ class TestGameLogic(TestCase):
         if whereTo == "W":
             waaa = (copy.deepcopy(self.gl.logicWasteCardPile))
             if card != "NA":
-                waaa.append(card)
+                if card not in waaa:
+                    waaa.append(card)
                 wa = card
             else:
                 wa = None
@@ -617,7 +622,7 @@ class TestGameLogic(TestCase):
         self.assertDictEqual(testFou, {0: ["d", "e", "c"], 1: ["c"]})
 
     def test_calculate_move(self):
-        self.insertVariables(2)
+        self.insertVariables(1)
 
         self.gl.calculate_move()
 
