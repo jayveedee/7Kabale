@@ -38,7 +38,7 @@ class GameLogic:
             self.logicWasteCardPile = logic_waste_card
             self.logicTableauCardPiles = logic_tableau_card_piles
             self.logicFoundationCardPiles = logic_foundation_card_piles
-            self.unknownWaste = 24
+            self.unknownWaste = 23
             for i in range(7):
                 counter = 0
                 for j in range(i):
@@ -366,3 +366,6 @@ class GameLogic:
 
     def get_piles(self):
         return self.logicTableauCardPiles, self.logicFoundationCardPiles, self.logicWasteCardPile
+
+    def get_unknown_counter(self):
+        return self.unknownWaste
