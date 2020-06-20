@@ -6,51 +6,6 @@ import random
 import copy
 
 
-def createDummyList(self, dummyVersion=0):
-    dummyList = {}
-    if dummyVersion >= 0:
-
-        for i in range(0, 7):
-            tempList = []
-
-            if dummyVersion == 1:
-                if i == 2:
-                    cardNumber = 2
-                    cardType = "d"
-                    tempList.append(str(cardNumber) + " " + cardType)
-
-            if dummyVersion == 2:
-                if i != 2:
-                    cardNumber = random.randint(1, 13)
-                    cardType = random.choice("hdsc")
-                    tempList.append(str(cardNumber) + " " + cardType)
-
-            if dummyVersion == 3:
-                if i > 3:
-                    for j in range(0, i):
-                        cardNumber = random.randint(1, 13)
-                        cardType = random.choice("hdsc")
-                        tempList.append(str(cardNumber) + " " + cardType)
-                else:
-                    cardNumber = random.randint(1, 13)
-                    cardType = random.choice("hdsc")
-                    tempList.append(str(cardNumber) + " " + cardType)
-
-            dummyList[i] = tempList
-
-    if dummyVersion == -1:
-        for i in range(0, 4):
-            tempList = []
-            dummyList[i] = tempList
-
-    return dummyList
-
-
-def create_list(tb0, tb1, tb2, tb3, tb4, tb5, tb6):
-    tb = {0: tb0, 1: tb1, 2: tb2, 3: tb3, 4: tb4, 5: tb5, 6: tb6}
-    return tb
-
-
 class TestGameLogic(TestCase):
 
     def test_play_game(self):
@@ -539,6 +494,73 @@ class TestGameLogic(TestCase):
         self.calculateMove(["WIN", "WIN", "WIN", "WIN", "WIN", "WIN", "WIN"],
                            ["NA", "NA", "NA", "NA", "NA"])
 
+    def test_update_logic_scan(self):
+        gl = create_empty_object()
+        waste_card_pile_actual = []
+        waste_card_unknown_actual = 24
+        tableau_actual = create_list([], [], [], [], [], [], [])
+        foundation_actual = create_list([], [], [], [])
+
+        max_range = 100000
+        card_count = 0
+        card_type = 0
+        for i in range(1, max_range):
+            card_count += 1
+            if card_count == 14: card_count = 1; card_type += 1
+            if card_type == 4: card_type = 0
+            if card_count > 9: waste_card_actual = str(card_count)
+            else: waste_card_actual = str(0) + str(card_count)
+            if card_type == 0: waste_card_actual += " h"
+            if card_type == 1: waste_card_actual += " s"
+            if card_type == 2: waste_card_actual += " c"
+            if card_type == 3: waste_card_actual += " d"
+            gl.update_logic_scan(waste_card_actual, None, None)
+            if waste_card_actual not in waste_card_pile_actual:
+                waste_card_pile_actual.append(waste_card_actual)
+                waste_card_unknown_actual -= 1
+            self.assertListEqual(gl.logicWasteCardPile, waste_card_pile_actual)
+            self.assertEqual(gl.unknownWaste, waste_card_unknown_actual)
+            self.assertEqual(len(gl.logicWasteCardPile), len(waste_card_pile_actual))
+        for i in range(1, max_range):
+            rand_index = random.randrange(7)
+            tableau_expected = create_list([], [], [], [], [], [], [])
+            card_count += 1
+            if card_count == 14: card_count = 1; card_type += 1
+            if card_type == 4: card_type = 0
+            if card_count > 9: tableau_card_actual = str(card_count)
+            else: tableau_card_actual = str(0) + str(card_count)
+            if card_type == 0: tableau_card_actual += " h"
+            if card_type == 1: tableau_card_actual += " s"
+            if card_type == 2: tableau_card_actual += " c"
+            if card_type == 3: tableau_card_actual += " d"
+            tableau_expected.get(rand_index).append(tableau_card_actual)
+            gl.update_logic_scan(None, tableau_expected, None)
+            if tableau_card_actual not in tableau_actual.get(rand_index):
+                tableau_actual.get(rand_index).append(tableau_card_actual)
+            tableau_actual.get(rand_index).sort(reverse=False)
+            self.assertDictEqual(gl.logicTableauCardPiles, tableau_actual)
+            self.assertEqual(len(gl.logicTableauCardPiles.get(rand_index)), len(tableau_actual.get(rand_index)))
+        for i in range(1, max_range):
+            rand_index = random.randrange(4)
+            foundation_expected = create_list([], [], [], [])
+            card_count += 1
+            if card_count == 14: card_count = 1; card_type += 1
+            if card_type == 4: card_type = 0
+            if card_count > 9: foundation_card_actual = str(card_count)
+            else: foundation_card_actual = str(0) + str(card_count)
+            if card_type == 0: foundation_card_actual += " h"
+            if card_type == 1: foundation_card_actual += " s"
+            if card_type == 2: foundation_card_actual += " c"
+            if card_type == 3: foundation_card_actual += " d"
+            foundation_expected.get(rand_index).append(foundation_card_actual)
+            gl.update_logic_scan(None, None, foundation_expected)
+            if foundation_card_actual not in foundation_actual.get(rand_index):
+                foundation_actual.get(rand_index).append(foundation_card_actual)
+            foundation_actual.get(rand_index).sort(reverse=True)
+            self.assertDictEqual(gl.logicFoundationCardPiles, foundation_actual)
+            self.assertEqual(len(gl.logicFoundationCardPiles.get(rand_index)), len(foundation_actual.get(rand_index)))
+        return
+
     def calculateMove(self, trueMove, trueResult):
         move = self.gl.calculate_move()
         # Calculates the move
@@ -579,20 +601,6 @@ class TestGameLogic(TestCase):
                 wa = None
             waa, _, _ = self.gl.update_logic_scan(wa, None, None)
             self.assertListEqual(waa, waaa)
-
-    def test_updateR_logic(self):
-        self.insertVariables(0)
-
-        testWas, testTab, testFou = self.gl.update_logic_scan([[]], self.createDummyList(0), self.createDummyList(-1))
-        self.assertListEqual(testWas, [[]])
-        self.assertDictEqual(testTab, self.logicTableauCardPiles)
-        self.assertDictEqual(testFou, self.logicFoundationCardPiles)
-
-        testWas, testTab, testFou = self.gl.update_logic_scan([["1", "h"], ["2", "c"]], self.createDummyList(0),
-                                                              self.createDummyList(-1))
-        self.assertListEqual(testWas, [[], ["1", "h"], ["2", "c"]])
-        self.assertDictEqual(testTab, self.logicTableauCardPiles)
-        self.assertDictEqual(testFou, self.logicFoundationCardPiles)
 
     def test_check_list_consistency(self):
         self.insertVariables()
@@ -742,3 +750,19 @@ class TestGameLogic(TestCase):
         self.logicFoundationCardPiles = {0: list0, 1: list00, 2: list000, 3: list0000}
 
         self.gl = GameLogic.GameLogic(self.logicWasteCard, self.logicTableauCardPiles, self.logicFoundationCardPiles)
+
+
+def create_list(li0, li1, li2, li3, li4=None, li5=None, li6=None):
+    if li4 is not None:
+        dict_lists = {0: li0, 1: li1, 2: li2, 3: li3, 4: li4, 5: li5, 6: li6}
+    else:
+        dict_lists = {0: li0, 1: li1, 2: li2, 3: li3}
+    return dict_lists
+
+
+def create_empty_object():
+    list0 = []; list00 = []; list000 = []; list0000 = []
+    foundation_piles = {0: list0, 1: list00, 2: list000, 3: list0000}
+    list1 = []; list11 = []; list111 = []; list1111 = []; list11111 = []; list111111 = []; list1111111 = []
+    tableau_piles = {0: list1, 1: list11, 2: list111, 3: list1111, 4: list11111, 5: list111111,6: list1111111}
+    return GameLogic.GameLogic(None, tableau_piles, foundation_piles)
