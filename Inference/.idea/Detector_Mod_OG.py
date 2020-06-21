@@ -47,6 +47,7 @@ dictionaryOfDetectedCards = Dictionaries.dictionaryOfDetectedCards
 dictionaryOfNewlyDiscoveredCards = Dictionaries.dictionaryOfNewlyDiscoveredCards
 current_pile = 0
 
+
 def detect_card(some_prediction):
     # we assume that if there was unknown cards, then you have just scanned it. However, we should make a smarter way
     # to detect if the unknown card has been scanned.
@@ -54,30 +55,13 @@ def detect_card(some_prediction):
     # there_are_unknown_cards = False
 
     card_name = dictionaryOfIndexToName.get(some_prediction[4])
-    #dictionaryOfDetectedCards[card_name] = True
-    #dictionaryOfNewlyDiscoveredCards[card_name] = True
-    #list_of_piles[current_pile].append(card_name)
+    dictionaryOfDetectedCards[card_name] = True
+    dictionaryOfNewlyDiscoveredCards[card_name] = True
+    list_of_piles[current_pile].append(card_name)
 
-    #if not game_has_just_started:
-    #    list_of_piles_only_containing_newly_detected_cards[current_pile].append(card_name)
+    if not game_has_just_started:
+        list_of_piles_only_containing_newly_detected_cards[current_pile].append(card_name)
         # list_of_piles[current_pile].append(card_name)
-
-    if current_pile > 6 and not 11:
-        foundation_piles.get(current_pile-7).append(card_name)
-    elif current_pile < 7:
-        tableu_piles.get(current_pile).append(card_name)
-    else:
-        # unknown_waste = game_logic.get_unknown_counter()
-        # unknown_waste -= 1
-        #TODO: this is a temporary løsning
-        #game_logic.unknownWaste -= 1
-
-        if game_logic.unknownWaste == 0:
-            game_logic.allUnknownWasteFound = True #HMMMMM, dette kommer måske ikke til at virke.
-            print(game_logic.allUnknownWasteFound)
-        waste_pile.append(card_name)
-
-    sortLists(tableu_piles, foundation_piles, waste_pile)
 
     return
 
@@ -86,7 +70,7 @@ def increment_card_viewed_counter(some_prediction):
     card_name = dictionaryOfIndexToName.get(some_prediction[4])
 
     # checking if already detected
-    if check_if_card_already_detected(card_name):
+    if dictionaryOfDetectedCards.get(card_name):
         return
 
     number_of_times_viewed = dictionaryOfCardFrameCounter.get(card_name)
@@ -99,46 +83,12 @@ def increment_card_viewed_counter(some_prediction):
     return
 
 
-def check_if_card_already_detected(card_name):
-    detected = False
-    for some_key, pile in tableu_piles.items():
-        if card_name in pile:
-            detected = True
-
-    for some_key, pile in foundation_piles.items():
-        if card_name in pile:
-            detected = True
-
-    if card_name in waste_pile:
-        detected = True
-
-    return detected
-
-
 def show_detected_cards(some_image):
     list_of_detected_cards = "Cards: "
 
-    """for some_name in list_of_piles[current_pile]:
+    for some_name in list_of_piles[current_pile]:
         list_of_detected_cards += some_name
-        list_of_detected_cards += " ,"""
-
-    # print(tableu_piles)
-    # print(foundation_piles)
-    # print(waste_pile)
-
-    #TODO: Fix that foundation piles shows the waste card piles
-    if current_pile > 6 and not 11:
-        pile = foundation_piles.get(current_pile-7)
-    elif current_pile < 7:
-        pile = tableu_piles.get(current_pile)
-    else:
-        pile = waste_pile
-
-    if pile is not None:
-        for card in pile:
-            list_of_detected_cards += card
-            list_of_detected_cards += ", "
-
+        list_of_detected_cards += " ,"
     cv2.putText(some_image, list_of_detected_cards, (0, 200), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
 
     return
@@ -187,7 +137,7 @@ def show_move(move, some_image):
         move_text = "Scan first card of each pile"
     else:
         if move is None or move[0] == "NA":
-            move_text = "No move. Scan from waste/flip cards."
+            move_text = "No Valid move. Take a card from the waste pile."
         else:
             card_number = move[0]
             card_suit = move[1]
@@ -225,29 +175,15 @@ def change_pile():
 
 
 def clear_current_pile():
-    if current_pile > 6 and not 11:
-        pile = foundation_piles[current_pile-7]
-    elif current_pile < 7:
-        pile = tableu_piles[current_pile]
-    else:
-        pile = waste_pile
-        # unknown_waste_counter = game_logic.get_unknown_counter()
-        # unknown_waste_counter = 24
-        game_logic.unknownWaste = 24
-        game_logic.allUnknownWasteFound = False
-
-    pile.clear()
-
-    """for card in list_of_piles[current_pile]:
+    for card in list_of_piles[current_pile]:
         dictionaryOfDetectedCards[card] = False
         dictionaryOfNewlyDiscoveredCards[card] = False
         dictionaryOfCardFrameCounter[card] = 0
 
     list_of_piles_only_containing_newly_detected_cards[current_pile].clear()
-    list_of_piles[current_pile].clear()"""
+    list_of_piles[current_pile].clear()
 
     return
-
 
 def sortLists(some_tableu_piles, some_foundation_piles, some_waste_cards):
 
@@ -258,55 +194,51 @@ def sortLists(some_tableu_piles, some_foundation_piles, some_waste_cards):
 
     return some_tableu_piles, some_foundation_piles, some_waste_cards
 
-
 def done_scanning():
+    print("I am running!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
     global game_has_just_started
     global game_logic
     global list_of_piles
 
-    print(game_logic.unknownWaste)
-    #if game_logic.unknownWaste == 0:
-     #   print(game_logic.unknownWasteCounter)
-
-    #print(len(game_logic.logicWasteCardPile))
-
-    #game_logic.allUnknownWasteFound = True
-
-    #game_logic.handle_update_reversed_waste_pile()
-
-    #print (game_logic.unknownWasteCounter)
-
-    if game_has_just_started:
-        game_has_just_started = False
-
-    """  # send data to Logic
+    # send data to Logic
     list_of_tableu_piles, list_of_foundation_piles, waste_cards = make_separate_lists(list_of_piles)
 
     list_of_tableu_piles, list_of_foundation_piles, waste_cards = sortLists(list_of_tableu_piles, list_of_foundation_piles, waste_cards)
 
-    list_of_tableu_piles, list_of_foundation_piles, new_waste_cards \
-        = make_separate_lists(list_of_piles_only_containing_newly_detected_cards)
-
-    list_of_tableu_piles, list_of_foundation_piles, new_waste_cards \
-        = sortLists(list_of_tableu_piles, list_of_foundation_piles, new_waste_cards)
-
-    if len(new_waste_cards) != 0:
-        last_waste_card = new_waste_cards[len(new_waste_cards) - 1]
-        game_logic.update_logic_scan(last_waste_card, list_of_tableu_piles, list_of_foundation_piles)
+    if game_has_just_started:
+        game_has_just_started = False
         print("********************************************************")
         print("Sending the following to logic:")
         print(f"Tableu_piles: {list_of_tableu_piles}")
         print(f"Foundation_piles: {list_of_foundation_piles}")
-        print(f"waste_cards: {last_waste_card}")
+        print(f"waste_cards: {waste_cards}")
         print(" ")
+        game_logic = GameLogic.GameLogic(waste_cards, list_of_tableu_piles, list_of_foundation_piles)
     else:
-        game_logic.update_logic_scan(None, list_of_tableu_piles, list_of_foundation_piles)
-        print("********************************************************")
-        print("Sending the following to logic:")
-        print(f"Tableu_piles: {list_of_tableu_piles}")
-        print(f"Foundation_piles: {list_of_foundation_piles}")
-        print(f"waste_cards: None")
-        print(" ")"""
+        list_of_tableu_piles, list_of_foundation_piles, new_waste_cards \
+            = make_separate_lists(list_of_piles_only_containing_newly_detected_cards)
+
+        list_of_tableu_piles, list_of_foundation_piles, new_waste_cards \
+            = sortLists(list_of_tableu_piles, list_of_foundation_piles, new_waste_cards)
+
+        if len(new_waste_cards) != 0:
+            last_waste_card = new_waste_cards[len(new_waste_cards) - 1]
+            game_logic.update_logic_scan(last_waste_card, list_of_tableu_piles, list_of_foundation_piles)
+            print("********************************************************")
+            print("Sending the following to logic:")
+            print(f"Tableu_piles: {list_of_tableu_piles}")
+            print(f"Foundation_piles: {list_of_foundation_piles}")
+            print(f"waste_cards: {last_waste_card}")
+            print(" ")
+        else:
+            game_logic.update_logic_scan(None, list_of_tableu_piles, list_of_foundation_piles)
+            print("********************************************************")
+            print("Sending the following to logic:")
+            print(f"Tableu_piles: {list_of_tableu_piles}")
+            print(f"Foundation_piles: {list_of_foundation_piles}")
+            print(f"waste_cards: None")
+            print(" ")
 
 
         # game_logic.update_logic_scan(new_waste_cards, list_of_tableu_piles, list_of_foundation_piles)
@@ -314,12 +246,12 @@ def done_scanning():
 
 
         # We clear the lists of newly detected cards
-        #for pile in range(12):
-        #    list_of_piles_only_containing_newly_detected_cards[pile].clear()
+        for pile in range(12):
+            list_of_piles_only_containing_newly_detected_cards[pile].clear()
 
     move = game_logic.calculate_move()
     game_logic.update_logic_move(move)
-    """list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards = game_logic.get_piles()
+    list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards = game_logic.get_piles()
 
     print("Getting the following piles from logic:")
     print(f"Tableu_piles: {list_of_tableu_piles}")
@@ -330,7 +262,7 @@ def done_scanning():
     update_card_piles(list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards)
     counter = game_logic.get_unknown_counter()
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    print(counter)"""
+    print(counter)
 
     return move
 
@@ -435,29 +367,15 @@ game_has_just_started = True
 some_move = None
 is_confirming_move = False  # the confirming_move-state is when the player is doing the move physically.
 game_logic = None
-tableu_piles = {}
-foundation_piles = {}
-waste_pile = []
-game_logic = GameLogic.GameLogic(None, None, None)
 # there_are_unknown_cards = False
 
 while not game_has_ended:
     # print(list_of_piles)
-
-    # Getting the piles from the logic.
-    tableu_piles, foundation_piles, waste_pile = game_logic.get_piles()
-
-    # Getting a frame from camera.
     ret, img = video_stream.read()
     final_image = img
-
     if not is_confirming_move:
-        # converting image to make it work with the detection
         im_pil = Image.fromarray(img)
-
-        # making the detection
         predictions, image = yolo.detect_image(im_pil, False)
-
         # sort the predictions based on ymin
         predictions.sort(key=lambda x: x[1], reverse=False)
 
