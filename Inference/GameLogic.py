@@ -1,5 +1,3 @@
-counter = 0
-
 def variable_check(card_number, unknowns):
     card_number_string = str(card_number)
     if card_number < 10:
@@ -27,9 +25,9 @@ class GameLogic:
         self.logicTableauCardPiles = {}
         self.logicFoundationCardPiles = {}
         self.unknownWaste = 0
+        self.loseCounter = 0
         self.unknownTableau = []
         self.allUnknownWasteFound = False
-        self.winCondition = False
         self.unknownWasteCounter = 25
         self.reset = True
         self.result = []
@@ -67,7 +65,6 @@ class GameLogic:
         else:
             if logic_waste_card is not None:
                 if logic_waste_card not in self.logicWasteCardPile:
-                    self.increment_counter()
                     self.unknownWaste -= 1
                     if self.unknownWaste == 0:
                         self.allUnknownWasteFound = True
@@ -109,9 +106,10 @@ class GameLogic:
         return ["NA", "NA", "NA", "NA", "NA"]
 
     def calculate_move(self):
-        self.check_win_condition()
-        if self.winCondition:
-            return ["WIN", "WIN", "WIN", "WIN", "WIN", "WIN", "WIN"]
+        if self.check_win_condition():
+            return self.result
+        elif self.check_lose_condition():
+            return self.result
 
         for i in range(len(self.logicTableauCardPiles)):
             current_pile = self.logicTableauCardPiles.get(i)
@@ -201,19 +199,20 @@ class GameLogic:
                     if len(current_old_scanned_pile) == 0:
                         old_scanned_pile[i] = current_new_scanned_pile
                     else:
+                        if current_new_scanned_pile[0] not in current_old_scanned_pile:
+                            current_old_scanned_pile.append(current_new_scanned_pile[0])
+                            if old_scanned_pile == self.logicTableauCardPiles:
+                                current_old_scanned_pile.sort(reverse=False)
+                            else:
+                                current_old_scanned_pile.sort(reverse=True)
+            elif len(current_new_scanned_pile) != 0 and len(current_old_scanned_pile) != 0:
+                if current_new_scanned_pile[0] != current_old_scanned_pile[0]:
+                    if current_new_scanned_pile[0] not in current_old_scanned_pile:
                         current_old_scanned_pile.append(current_new_scanned_pile[0])
                         if old_scanned_pile == self.logicTableauCardPiles:
                             current_old_scanned_pile.sort(reverse=False)
                         else:
                             current_old_scanned_pile.sort(reverse=True)
-            elif len(current_new_scanned_pile) != 0 and len(current_old_scanned_pile) != 0:
-                if current_new_scanned_pile[0] != current_old_scanned_pile[0]:
-                    current_old_scanned_pile.append(current_new_scanned_pile[0])
-                    if old_scanned_pile == self.logicTableauCardPiles:
-                        current_old_scanned_pile.sort(reverse=False)
-                    else:
-                        current_old_scanned_pile.sort(reverse=True)
-
         return old_scanned_pile
 
     def handle_update_reversed_waste_pile(self):
@@ -294,6 +293,7 @@ class GameLogic:
         if self.unknownWaste != 0:
             return ["NA", "NA", "NA", "NA", "NA", "W", "YES"]
         else:
+            self.loseCounter += 1
             return ["NA", "NA", "NA", "NA", "NA", "W", "NO"]
 
     def check_if_all_waste_cards_found(self):
@@ -347,6 +347,8 @@ class GameLogic:
         return current_card_number, current_card_type, card_pile
 
     def create_move(self, card_number_string, card_type, i, j, move_from, move_type, scan):
+        self.loseCounter = 0
+
         self.result.append(card_number_string)
         self.result.append(card_type)
         self.result.append(str(i))
@@ -370,14 +372,23 @@ class GameLogic:
         return -1
 
     def check_win_condition(self):
-
         foundation_one = len(self.logicFoundationCardPiles.get(0))
         foundation_two = len(self.logicFoundationCardPiles.get(1))
         foundation_three = len(self.logicFoundationCardPiles.get(2))
         foundation_four = len(self.logicFoundationCardPiles.get(3))
 
         if foundation_one + foundation_two + foundation_three + foundation_four == 52:
-            self.winCondition = True
+            for i in range(7):
+                self.result.append("WIN")
+            return True
+        return False
+
+    def check_lose_condition(self):
+        if self.loseCounter > len(self.logicWasteCardPile) and self.unknownWaste == 0:
+            for i in range(7):
+                self.result.append("LOSE")
+            return True
+        return False
 
     def reset_logic(self, logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles):
         self.reset = True
