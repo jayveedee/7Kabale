@@ -37,7 +37,10 @@ class GameLogic:
         if (self.logicTableauCardPiles is None and self.logicFoundationCardPiles is None and self.logicWasteCardPile is None) or (self.reset is True):
             self.logicTableauCardPiles = logic_tableau_card_piles
             self.logicFoundationCardPiles = logic_foundation_card_piles
+            if logic_waste_card is not None:
+                self.logicWasteCardPile = logic_waste_card
             self.unknownWaste = 24
+            self.unknownTableau.clear()
             for i in range(7):
                 counter = 0
                 for j in range(i):

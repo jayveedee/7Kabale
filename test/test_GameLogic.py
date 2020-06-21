@@ -8,6 +8,7 @@ import copy
 
 class TestGameLogic(TestCase):
 
+    # TC00 - Test Case (Spil et spil færdigt)
     def test_play_game(self):
         tb = create_list(["06 h"], ["06 c"], ["13 d"], ["04 d"], ["03 h"], ["02 s"], ["08 c"])
         fd = {0: [], 1: [], 2: [], 3: []}
@@ -132,7 +133,8 @@ class TestGameLogic(TestCase):
         self.updateLists("W", "NA", -1)
 
         # Move & Update
-        self.calculateMove(["07", "s", "4", "2", "T", "T", "YES"], ["05 s", "06 h", "07 s", "08 h", "09 s", "10 d", "11 c", "12 h"])
+        self.calculateMove(["07", "s", "4", "2", "T", "T", "YES"],
+                           ["05 s", "06 h", "07 s", "08 h", "09 s", "10 d", "11 c", "12 h"])
         self.updateLists("T", "10 c", 4)
 
         # Move & Update
@@ -184,7 +186,8 @@ class TestGameLogic(TestCase):
         self.updateLists("W", "NA", -1)
 
         # Move & Update
-        self.calculateMove(["06", "c", "1", "6", "T", "T", "YES"], ["02 s", "03 h", "04 c", "05 h", "06 c", "07 d", "08 c"])
+        self.calculateMove(["06", "c", "1", "6", "T", "T", "YES"],
+                           ["02 s", "03 h", "04 c", "05 h", "06 c", "07 d", "08 c"])
         self.updateLists("T", "07 h", 1)
 
         # Move & Update
@@ -204,15 +207,19 @@ class TestGameLogic(TestCase):
         self.updateLists("W", "NA", -1)
 
         # Move & Update
-        self.calculateMove(["08", "c", "6", "0", "T", "T", "YES"], ["02 s", "03 h", "04 c", "05 h", "06 c", "07 d", "08 c", "09 h", "10 c", "11 h", "12 s", "13 d"])
+        self.calculateMove(["08", "c", "6", "0", "T", "T", "YES"],
+                           ["02 s", "03 h", "04 c", "05 h", "06 c", "07 d", "08 c", "09 h", "10 c", "11 h", "12 s",
+                            "13 d"])
         self.updateLists("T", "13 s", 6)
 
         # Move & Update
-        self.calculateMove(["12", "h", "2", "6", "T", "T", "NO"], ["05 s", "06 h", "07 s", "08 h", "09 s", "10 d", "11 c", "12 h", "13 s"])
+        self.calculateMove(["12", "h", "2", "6", "T", "T", "NO"],
+                           ["05 s", "06 h", "07 s", "08 h", "09 s", "10 d", "11 c", "12 h", "13 s"])
         self.updateLists("T", "NA", 6)
 
         # Move & Update
-        self.calculateMove(["13", "s", "6", "2", "T", "T", "YES"], ["05 s", "06 h", "07 s", "08 h", "09 s", "10 d", "11 c", "12 h", "13 s"])
+        self.calculateMove(["13", "s", "6", "2", "T", "T", "YES"],
+                           ["05 s", "06 h", "07 s", "08 h", "09 s", "10 d", "11 c", "12 h", "13 s"])
         self.updateLists("T", "12 d", 6)
 
         # Move & Update
@@ -316,11 +323,13 @@ class TestGameLogic(TestCase):
         self.updateLists("T", "NA", 2)
 
         # Move & Update
-        self.calculateMove(["07", "h", "1", "1", "F", "T", "NO"], ["07 h", "06 h", "05 h", "04 h", "03 h", "02 h", "01 h"])
+        self.calculateMove(["07", "h", "1", "1", "F", "T", "NO"],
+                           ["07 h", "06 h", "05 h", "04 h", "03 h", "02 h", "01 h"])
         self.updateLists("T", "NA", 1)
 
         # Move & Update
-        self.calculateMove(["07", "s", "2", "2", "F", "T", "NO"], ["07 s", "06 s", "05 s", "04 s", "03 s", "02 s", "01 s"])
+        self.calculateMove(["07", "s", "2", "2", "F", "T", "NO"],
+                           ["07 s", "06 s", "05 s", "04 s", "03 s", "02 s", "01 s"])
         self.updateLists("T", "NA", 2)
 
         # Move & Update
@@ -341,7 +350,8 @@ class TestGameLogic(TestCase):
         self.updateLists("W", "NA", -1)
 
         # Move & Update
-        self.calculateMove(["08", "s", "-1", "2", "F", "W", "NO"], ["08 s", "07 s", "06 s", "05 s", "04 s", "03 s", "02 s", "01 s"])
+        self.calculateMove(["08", "s", "-1", "2", "F", "W", "NO"],
+                           ["08 s", "07 s", "06 s", "05 s", "04 s", "03 s", "02 s", "01 s"])
         self.updateLists("W", "NA", -1)
 
         # Move & Update
@@ -349,7 +359,8 @@ class TestGameLogic(TestCase):
         self.updateLists("W", "NA", -1)
 
         # Move & Update
-        self.calculateMove(["07", "c", "-1", "2", "T", "W", "NO"], ["07 c", "08 d", "09 s", "10 d", "11 c", "12 h", "13 s"])
+        self.calculateMove(["07", "c", "-1", "2", "T", "W", "NO"],
+                           ["07 c", "08 d", "09 s", "10 d", "11 c", "12 h", "13 s"])
         self.updateLists("W", "NA", -1)
 
         # Move & Update
@@ -428,7 +439,8 @@ class TestGameLogic(TestCase):
 
         # Move & Update
         self.calculateMove(["12", "d", "3", "0", "F", "T", "NO"],
-                           ["12 d", "11 d", "10 d", "09 d", "08 d", "07 d", "06 d", "05 d", "04 d", "03 d", "02 d", "01 d"])
+                           ["12 d", "11 d", "10 d", "09 d", "08 d", "07 d", "06 d", "05 d", "04 d", "03 d", "02 d",
+                            "01 d"])
         self.updateLists("T", "NA", 3)
 
         # Move & Update
@@ -452,12 +464,14 @@ class TestGameLogic(TestCase):
 
         # Move & Update
         self.calculateMove(["12", "s", "0", "2", "F", "T", "NO"],
-                           ["12 s", "11 s", "10 s", "09 s", "08 s", "07 s", "06 s", "05 s", "04 s", "03 s", "02 s", "01 s"])
+                           ["12 s", "11 s", "10 s", "09 s", "08 s", "07 s", "06 s", "05 s", "04 s", "03 s", "02 s",
+                            "01 s"])
         self.updateLists("T", "NA", 0)
 
         # Move & Update
         self.calculateMove(["13", "d", "0", "0", "F", "T", "NO"],
-                           ["13 d", "12 d", "11 d", "10 d", "09 d", "08 d", "07 d", "06 d", "05 d", "04 d", "03 d", "02 d",
+                           ["13 d", "12 d", "11 d", "10 d", "09 d", "08 d", "07 d", "06 d", "05 d", "04 d", "03 d",
+                            "02 d",
                             "01 d"])
         self.updateLists("T", "NA", 0)
 
@@ -468,32 +482,38 @@ class TestGameLogic(TestCase):
 
         # Move & Update
         self.calculateMove(["12", "h", "2", "1", "F", "T", "NO"],
-                            ["12 h", "11 h", "10 h", "09 h", "08 h", "07 h", "06 h", "05 h", "04 h", "03 h", "02 h", "01 h"])
+                           ["12 h", "11 h", "10 h", "09 h", "08 h", "07 h", "06 h", "05 h", "04 h", "03 h", "02 h",
+                            "01 h"])
         self.updateLists("T", "NA", 2)
 
         # Move & Update
         self.calculateMove(["13", "s", "2", "2", "F", "T", "NO"],
-                           ["13 s", "12 s", "11 s", "10 s", "09 s", "08 s", "07 s", "06 s", "05 s", "04 s", "03 s", "02 s", "01 s"])
+                           ["13 s", "12 s", "11 s", "10 s", "09 s", "08 s", "07 s", "06 s", "05 s", "04 s", "03 s",
+                            "02 s", "01 s"])
         self.updateLists("T", "NA", 3)
 
         # Move & Update
         self.calculateMove(["12", "c", "4", "3", "F", "T", "NO"],
-                           ["12 c", "11 c", "10 c", "09 c", "08 c", "07 c", "06 c", "05 c", "04 c", "03 c", "02 c", "01 c"])
+                           ["12 c", "11 c", "10 c", "09 c", "08 c", "07 c", "06 c", "05 c", "04 c", "03 c", "02 c",
+                            "01 c"])
         self.updateLists("T", "NA", 4)
 
         # Move & Update
         self.calculateMove(["13", "c", "3", "3", "F", "T", "NO"],
-                           ["13 c", "12 c", "11 c", "10 c", "09 c", "08 c", "07 c", "06 c", "05 c", "04 c", "03 c", "02 c", "01 c"])
+                           ["13 c", "12 c", "11 c", "10 c", "09 c", "08 c", "07 c", "06 c", "05 c", "04 c", "03 c",
+                            "02 c", "01 c"])
         self.updateLists("T", "NA", 3)
 
         # Move & Update
         self.calculateMove(["13", "h", "4", "1", "F", "T", "NO"],
-                           ["13 h", "12 h", "11 h", "10 h", "09 h", "08 h", "07 h", "06 h", "05 h", "04 h", "03 h", "02 h", "01 h"])
+                           ["13 h", "12 h", "11 h", "10 h", "09 h", "08 h", "07 h", "06 h", "05 h", "04 h", "03 h",
+                            "02 h", "01 h"])
         self.updateLists("T", "NA", 4)
 
         self.calculateMove(["WIN", "WIN", "WIN", "WIN", "WIN", "WIN", "WIN"],
                            ["NA", "NA", "NA", "NA", "NA"])
 
+    # TC01 - Test Case (Opdater via scan)
     def test_update_logic_scan(self):
         gl = create_empty_object()
         waste_card_pile_actual = []
@@ -508,8 +528,10 @@ class TestGameLogic(TestCase):
             card_count += 1
             if card_count == 14: card_count = 1; card_type += 1
             if card_type == 4: card_type = 0
-            if card_count > 9: waste_card_actual = str(card_count)
-            else: waste_card_actual = str(0) + str(card_count)
+            if card_count > 9:
+                waste_card_actual = str(card_count)
+            else:
+                waste_card_actual = str(0) + str(card_count)
             if card_type == 0: waste_card_actual += " h"
             if card_type == 1: waste_card_actual += " s"
             if card_type == 2: waste_card_actual += " c"
@@ -527,8 +549,10 @@ class TestGameLogic(TestCase):
             card_count += 1
             if card_count == 14: card_count = 1; card_type += 1
             if card_type == 4: card_type = 0
-            if card_count > 9: tableau_card_actual = str(card_count)
-            else: tableau_card_actual = str(0) + str(card_count)
+            if card_count > 9:
+                tableau_card_actual = str(card_count)
+            else:
+                tableau_card_actual = str(0) + str(card_count)
             if card_type == 0: tableau_card_actual += " h"
             if card_type == 1: tableau_card_actual += " s"
             if card_type == 2: tableau_card_actual += " c"
@@ -546,8 +570,10 @@ class TestGameLogic(TestCase):
             card_count += 1
             if card_count == 14: card_count = 1; card_type += 1
             if card_type == 4: card_type = 0
-            if card_count > 9: foundation_card_actual = str(card_count)
-            else: foundation_card_actual = str(0) + str(card_count)
+            if card_count > 9:
+                foundation_card_actual = str(card_count)
+            else:
+                foundation_card_actual = str(0) + str(card_count)
             if card_type == 0: foundation_card_actual += " h"
             if card_type == 1: foundation_card_actual += " s"
             if card_type == 2: foundation_card_actual += " c"
@@ -560,6 +586,58 @@ class TestGameLogic(TestCase):
             self.assertDictEqual(gl.logicFoundationCardPiles, foundation_actual)
             self.assertEqual(len(gl.logicFoundationCardPiles.get(rand_index)), len(foundation_actual.get(rand_index)))
         return
+
+    def test_update_logic_move(self):
+        gl = create_empty_object()
+        waste_card_pile_actual = ["11 c", "02 s", "01 h"]
+        tableau_actual = create_list(["01 s"], ["13 c"], ["12 h"], ["07 d"], ["08 s"], ["06 c"], ["09 h"])
+        foundation_actual = create_list([], [], [], [])
+
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        for i in range(7):
+            self.assertEqual(gl.unknownTableau[i], i)
+
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["01 s"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["13 c"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["12 h", "13 c"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["07 d", "08 s"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["07 d", "08 s", "09 h"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["06 c", "07 d", "08 s", "09 h"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["01 h"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["02 s", "01 s"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["11 c", "12 h", "13 c"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["NA", "NA", "NA", "NA", "NA"])
+
+        self.assertEqual(gl.unknownTableau[0], 0)
+        self.assertEqual(gl.unknownTableau[1], 0)
+        self.assertEqual(gl.unknownTableau[2], 1)
+        self.assertEqual(gl.unknownTableau[3], 2)
+        self.assertEqual(gl.unknownTableau[4], 3)
+        self.assertEqual(gl.unknownTableau[5], 4)
+        self.assertEqual(gl.unknownTableau[6], 6)
+
+        waste_card_pile_actual = ["05 d", "13 c", "06 s"]
+        tableau_actual = create_list(["03 s"], ["05 h"], ["10 s"], ["07 c"], ["07 h"], ["06 c"], ["09 h"])
+        foundation_actual = create_list([], [], [], [])
+
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        for i in range(7):
+            self.assertEqual(gl.unknownTableau[i], i)
+
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["05 h", "06 c"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["05 h", "06 c", "07 h"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["09 h", "10 s"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["NA", "NA", "NA", "NA", "NA"])
+
+        self.assertEqual(gl.unknownTableau[0], 0)
+        self.assertEqual(gl.unknownTableau[1], 0)
+        self.assertEqual(gl.unknownTableau[2], 2)
+        self.assertEqual(gl.unknownTableau[3], 3)
+        self.assertEqual(gl.unknownTableau[4], 4)
+        self.assertEqual(gl.unknownTableau[5], 4)
+        self.assertEqual(gl.unknownTableau[6], 5)
 
     def calculateMove(self, trueMove, trueResult):
         move = self.gl.calculate_move()
@@ -602,94 +680,27 @@ class TestGameLogic(TestCase):
             waa, _, _ = self.gl.update_logic_scan(wa, None, None)
             self.assertListEqual(waa, waaa)
 
-    def test_check_list_consistency(self):
-        self.insertVariables()
-        empytyList = self.createDummyList(0)
-        dummyList = self.createDummyList(1)
-        testList = self.createDummyList(2)
-        resultTest = testList.copy()
-        resultTest[2] = ["2 d"]
-
-        self.assertDictEqual(self.gl.check_list_consistency(dummyList, testList), resultTest)
-        self.assertDictEqual(self.gl.check_list_consistency(empytyList, self.createDummyList(1)), dummyList)
-
-    def test_reset_logic(self):
-        self.insertVariables()
-
-        testWas, testTab, testFou = self.gl.reset_logic(None, None, None)
-
-        self.assertIsNone(testWas)
-        self.assertIsNone(testTab)
-        self.assertIsNone(testFou)
-
-        testWas, testTab, testFou = self.gl.reset_logic([""], {0: ["a", "b", "c"], 1: ["a"]},
-                                                        {0: ["d", "e", "c"], 1: ["c"]})
-
-        self.assertListEqual(testWas, [""])
-        self.assertDictEqual(testTab, {0: ["a", "b", "c"], 1: ["a"]})
-        self.assertDictEqual(testFou, {0: ["d", "e", "c"], 1: ["c"]})
-
     def test_calculate_move(self):
-        self.insertVariables(1)
+        gl = create_empty_object()
+        waste_card_pile_actual = ["08 s", "12 c", "03 c", "03 d", "09 d"]
+        waste_card_unknown_actual = 24
+        tableau_actual = create_list(["04 s"], ["05 h", "06 c"], ["01 d"], ["02 d"], ["10 c"], ["11 h"], ["13 h"])
+        foundation_actual = create_list(["02 c", "01 c"], [], [], [])
 
-        self.gl.calculate_move()
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
 
-        self.assertListEqual(self.gl.calculate_move(), ["5", "h", "2", "0", "T", "T", "YES"])
-        self.gl.update_logic_move(self.gl.calculate_move())
-        self.assertListEqual(self.gl.calculate_move(), ["1", "s", "4", "0", "F", "T", "YES"])
-        self.gl.update_logic_move(self.gl.calculate_move())
-        self.assertListEqual(self.gl.calculate_move(), ["13", "s", "5", "2", "T", "T", "YES"])
-        self.gl.update_logic_move(self.gl.calculate_move())
-        self.assertListEqual(self.gl.calculate_move(), ["3", "h", "6", "2", "F", "T", "YES"])
-        self.gl.update_logic_move(self.gl.calculate_move())
-        self.assertListEqual(self.gl.calculate_move(), ["1", "d", "-1", "1", "F", "W", "YES"])
-        self.gl.update_logic_move(self.gl.calculate_move())
-        self.gl.logicTableauCardPiles.get(5).clear()
-        self.gl.logicTableauCardPiles.get(5).append("4 h")
-        self.assertListEqual(self.gl.calculate_move(), ["4", "h", "5", "2", "F", "T", "YES"])
-        self.gl.update_logic_move(self.gl.calculate_move())
-        self.gl.logicWasteCardPile = [["12", "d"]]
-        self.assertListEqual(self.gl.calculate_move(), ["12", "d", "-1", "2", "T", "W", "YES"])
-        self.gl.update_logic_move(self.gl.calculate_move())
-        self.gl.logicFoundationCardPiles.clear()
-        self.gl.logicFoundationCardPiles = {0: [], 1: [], 2: ["2 c"], 3: []}
-        self.assertListEqual(self.gl.calculate_move(), ["11", "s", "1", "2", "T", "T", "YES"])
-        self.gl.update_logic_move(self.gl.calculate_move())
-        # SHOULD BE ERROR, PLS FIX
-        self.assertListEqual(self.gl.calculate_move(), ["12", "d", "2", "3", "T", "T", "NO"])
-
-    def test_updateM_logic(self):
-        self.insertVariables()
-
-        self.assertListEqual(self.gl.update_logic_move(["05", "h", "2", "0", "T", "T", "NO"]),
-                             ["04 s", "05 h", "06 c", "07 d", "08 s"])
-        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["01 s"])
-        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["13 s"])
-        self.gl.logicTableauCardPiles.get(5).clear()
-        self.gl.logicTableauCardPiles.get(5).append("04 h")
-        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["03 h", "02 h", "01 h"])
-        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["04 h", "03 h", "02 h", "01 h"])
-        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["01 d"])
-        self.gl.logicWasteCardPile.append(["12", "d"])
-        self.assertListEqual(self.gl.update_logic_move(["12", "d", "-1", "3", "T", "W", "YES"]), ["12 d", "13 c"])
-        self.gl.logicWasteCardPile.append(["11", "c"])
-        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["11 s", "12 d", "13 c"])
-        self.gl.logicTableauCardPiles.get(2).append("12 h")
-        self.assertListEqual(self.gl.update_logic_move(["12", "h", "2", "4", "T", "T", "NO"]), ["12 h", "13 s"])
-        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["11 c", "12 h", "13 s"])
-        self.assertListEqual(self.gl.update_logic_move(self.gl.calculate_move()), ["NA", "NA", "NA", "NA", "NA"])
-
-    def test_check_card_placement(self):
-        self.insertVariables()
-
-        self.assertTrue(self.gl.check_card_placement(-1, 5, "d", 0, 6, "c", False))
-        self.assertTrue(self.gl.check_card_placement(-1, 13, "c", 3, -1, "-1", False))
-        self.assertTrue(self.gl.check_card_placement(6, 3, "h", 2, -1, "-1", False))
-        self.assertFalse(self.gl.check_card_placement(6, 4, "h", 1, -1, "-1", False))
-        self.assertFalse(self.gl.check_card_placement(3, 11, "s", 5, 10, "s", False))
-        self.assertTrue(self.gl.check_card_placement(3, 11, "s", 5, 12, "d", False))
-        self.assertFalse(self.gl.check_card_placement(2, 7, "d", 1, 8, "d", False))
-        self.assertFalse(self.gl.check_card_placement(2, 7, "d", 1, 7, "d", False))
+        list_of_actual_moves = [["04", "s", "0", "1", "T", "T", "NO"], ["01", "d", "2", "1", "F", "T", "YES"],
+                                ["02", "d", "3", "1", "F", "T", "YES"], ["10", "c", "4", "5", "T", "T", "YES"],
+                                ["13", "h", "6", "0", "T", "T", "YES"], ["09", "d", "-1", "5", "T", "W", "YES"],
+                                ["03", "d", "-1", "1", "F", "W", "YES"], ["03", "c", "-1", "0", "F", "W", "YES"],
+                                ["12", "c", "-1", "0", "T", "W", "YES"], ["11", "h", "5", "0", "T", "T", "YES"],
+                                ["08", "s", "-1", "0", "T", "W", "YES"], ["NA", "NA", "NA", "NA", "NA", "W", "YES"]]
+        for i in range(len(list_of_actual_moves)):
+            self.assertListEqual(gl.calculate_move(), list_of_actual_moves[i])
+            actual_unknown_tableau = copy.deepcopy(gl.unknownTableau)
+            gl.update_logic_move(gl.calculate_move())
+            if int(list_of_actual_moves[i][2]) != -1:
+                self.assertEqual(gl.unknownTableau[int(list_of_actual_moves[i][2])], actual_unknown_tableau[int(list_of_actual_moves[i][2])] - 1)
 
     def test_check_foundation_card_pile(self):
         self.insertVariables(0)
@@ -761,8 +772,17 @@ def create_list(li0, li1, li2, li3, li4=None, li5=None, li6=None):
 
 
 def create_empty_object():
-    list0 = []; list00 = []; list000 = []; list0000 = []
+    list0 = [];
+    list00 = [];
+    list000 = [];
+    list0000 = []
     foundation_piles = {0: list0, 1: list00, 2: list000, 3: list0000}
-    list1 = []; list11 = []; list111 = []; list1111 = []; list11111 = []; list111111 = []; list1111111 = []
-    tableau_piles = {0: list1, 1: list11, 2: list111, 3: list1111, 4: list11111, 5: list111111,6: list1111111}
+    list1 = [];
+    list11 = [];
+    list111 = [];
+    list1111 = [];
+    list11111 = [];
+    list111111 = [];
+    list1111111 = []
+    tableau_piles = {0: list1, 1: list11, 2: list111, 3: list1111, 4: list11111, 5: list111111, 6: list1111111}
     return GameLogic.GameLogic(None, tableau_piles, foundation_piles)
