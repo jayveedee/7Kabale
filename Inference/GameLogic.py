@@ -37,9 +37,25 @@ class GameLogic:
 
     def update_logic_scan(self, logic_waste_card=None, logic_tableau_card_piles=None, logic_foundation_card_piles=None):
         if (self.logicTableauCardPiles is None and self.logicFoundationCardPiles is None and self.logicWasteCardPile is None) or (self.reset is True):
-            self.logicWasteCardPile = logic_waste_card
-            self.logicTableauCardPiles = logic_tableau_card_piles
-            self.logicFoundationCardPiles = logic_foundation_card_piles
+            if logic_waste_card is not None:
+                self.logicWasteCardPile = logic_waste_card
+            if logic_tableau_card_piles is not None:
+                self.logicTableauCardPiles = logic_tableau_card_piles
+            else:
+                self.logicTableauCardPiles = {0:[],
+                                              1:[],
+                                              2:[],
+                                              3:[],
+                                              4:[],
+                                              5:[],
+                                              6:[]}
+            if logic_foundation_card_piles is not None:
+                self.logicFoundationCardPiles = logic_foundation_card_piles
+            else:
+                self.logicFoundationCardPiles = {0:[],
+                                              1:[],
+                                              2:[],
+                                              3:[]}
             self.unknownWaste = 24
             for i in range(7):
                 counter = 0
