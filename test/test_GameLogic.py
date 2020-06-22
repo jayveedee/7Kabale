@@ -813,7 +813,7 @@ class TestGameLogic(TestCase):
         self.assertEqual(self.gl.check_foundation_card_pile(3, "c"), -1)
 
     def test_simulate_many_games(self):
-        number_of_games = 100
+        number_of_games = 1000
         number_of_wins = 0
 
         print(f"Going to play {number_of_games} games. Please wait")
@@ -829,16 +829,15 @@ class TestGameLogic(TestCase):
 
             while game_is_running:
                 # play the game
-                """if len(waste_pile) == 0:
-                    game_logic.update_logic_scan(None, tableu_piles, foundation_piles)"""
+                move = game_logic.calculate_move()
+                game_logic.update_logic_move(move)
                 if game_logic.unknownWaste == 0:
                     game_logic.update_logic_scan(None, tableu_piles, foundation_piles)
                 else:
                     game_logic.update_logic_scan(waste_card, tableu_piles, foundation_piles)
-                move = game_logic.calculate_move()
+                waste_card = None
                 # print(move)
                 # print(game_logic.unknownWaste)
-                game_logic.update_logic_move(move)
 
                 tableu_piles = create_list([], [], [], [], [], [], [])
                 foundation_piles = create_list([], [], [], [])
@@ -874,7 +873,8 @@ class TestGameLogic(TestCase):
 
 
             # on finish
-            print(f"Number of games played: {i + 1}")
+            if (i + 1) % 10 == 0:
+                print(f"Number of games played: {i + 1}")
 
         print(f"Number of wins: {number_of_wins} out of {number_of_games}")
 
