@@ -804,6 +804,22 @@ class TestGameLogic(TestCase):
 
         self.assertListEqual(gl.calculate_move(), ["06", "s", "1", "2", "T", "T", "YES"])
 
+        gl = create_empty_object()
+        waste_card_pile_actual = []
+        tableau_actual = create_list(["07 d"], ["06 s"], [], ["06 c"], [], [], [])
+        foundation_actual = create_list([], ["06 d"], [], [])
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        self.assertListEqual(gl.calculate_move(), ["06", "s", "1", "0", "T", "T", "YES"])
+
+        gl = create_empty_object()
+        waste_card_pile_actual = []
+        tableau_actual = create_list(["07 d"], ["05 s"], [], ["06 c"], [], [], [])
+        foundation_actual = create_list([], ["06 d"], [], [])
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        self.assertListEqual(gl.calculate_move(), ["06", "c", "3", "0", "T", "T", "YES"])
+
     def test_check_foundation_card_pile(self):
         self.insertVariables(0)
 
@@ -813,10 +829,10 @@ class TestGameLogic(TestCase):
         self.assertEqual(self.gl.check_foundation_card_pile(3, "c"), -1)
 
     def test_simulate_many_games(self):
-        number_of_games = 1000
+        number_of_games = 100000
         number_of_wins = 0
 
-        print(f"Going to play {number_of_games} games. Please wait")
+        print(f"Simulating {number_of_games} solitaire games. Please wait...")
 
         for i in range(number_of_games):
             # start game
@@ -836,8 +852,6 @@ class TestGameLogic(TestCase):
                 else:
                     game_logic.update_logic_scan(waste_card, tableu_piles, foundation_piles)
                 waste_card = None
-                # print(move)
-                # print(game_logic.unknownWaste)
 
                 tableu_piles = create_list([], [], [], [], [], [], [])
                 foundation_piles = create_list([], [], [], [])
@@ -873,10 +887,11 @@ class TestGameLogic(TestCase):
 
 
             # on finish
-            if (i + 1) % 10 == 0:
+            if (i + 1) % (number_of_games/10) == 0:
                 print(f"Number of games played: {i + 1}")
 
         print(f"Number of wins: {number_of_wins} out of {number_of_games}")
+        print(f"Win rate: {(number_of_wins / number_of_games) * 100}%")
 
     def setup_a_random_game(self):
         global dictionary_of_cards

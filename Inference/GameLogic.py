@@ -152,21 +152,21 @@ class GameLogic:
         return self.check_waste_card_placement()
 
     def check_priority_one(self, current_pile, i):
-        if self.unknownTableau[i] == 0:
-            sub_current_card_number, sub_current_card_type, _ = self.define_card(i, len(current_pile) - 1, "T")
-            for k in range(len(self.logicTableauCardPiles)):
-                sub_next_pile = self.logicTableauCardPiles.get(k)
+        sub_current_card_number, sub_current_card_type, _ = self.define_card(i, len(current_pile) - 1, "T")
+        for k in range(len(self.logicTableauCardPiles)):
+            sub_next_pile = self.logicTableauCardPiles.get(k)
 
-                if len(sub_next_pile) != 0 and sub_next_pile != current_pile:
-                    sub_next_card_number, sub_next_card_type, _ = self.define_card(k, len(sub_next_pile) - 1, "T")
+            if len(sub_next_pile) != 0 and sub_next_pile != current_pile:
+                sub_next_card_number, sub_next_card_type, _ = self.define_card(k, len(sub_next_pile) - 1, "T")
 
-                    if check_card_type_matches(sub_current_card_type, sub_next_card_type, 1):
-                        if sub_current_card_number == sub_next_card_number and self.unknownTableau[k] != 0:
-                            return "P1"
+                if check_card_type_matches(sub_current_card_type, sub_next_card_type, 1) and self.unknownTableau[i] == 0:
+                    if sub_current_card_number == sub_next_card_number and self.unknownTableau[k] != 0:
+                        return "P1"
 
-                    # TODO FIX CARDS BEING PUT ON FOUNDATION BEFORE CHECKING IF A CARD CAN BE PLACED ON THE CURRENT CARD TO REVEAL A UNKNOWN CARD
-                    # if self.check_priority_two()
-                    #     return "P2"
+                # TODO FIX CARDS BEING PUT ON FOUNDATION BEFORE CHECKING IF A CARD CAN BE PLACED ON THE CURRENT CARD TO REVEAL A UNKNOWN CARD
+                if check_card_type_matches(sub_current_card_type,sub_next_card_type) and self.unknownTableau[k] != 0:
+                    if sub_current_card_number - 1 == sub_next_card_number and self.check_foundation_card_pile:
+                        return "P2"
         return "NA"
 
     def check_tableau_placement(self, card_number, card_type, current_pile, i, j, next_card_number, next_card_type):
