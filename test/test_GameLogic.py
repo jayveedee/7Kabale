@@ -373,27 +373,27 @@ class TestGameLogic(TestCase):
         self.updateLists("W", "NA", -1)
 
         # Move & Update
-        self.calculateMove(["06", "c", "0", "3", "F", "T", "NO"],
+        self.calculateMove(["06", "c", "0", "3", "F", "T", "TOPCARD"],
                            ["06 c", "05 c", "04 c", "03 c", "02 c", "01 c"])
         self.updateLists("T", "NA", 0)
 
         # Move & Update
-        self.calculateMove(["07", "d", "0", "0", "F", "T", "NO"],
+        self.calculateMove(["07", "d", "0", "0", "F", "T", "TOPCARD"],
                            ["07 d", "06 d", "05 d", "04 d", "03 d", "02 d", "01 d"])
         self.updateLists("T", "NA", 0)
 
         # Move & Update
-        self.calculateMove(["07", "c", "2", "3", "F", "T", "NO"],
+        self.calculateMove(["07", "c", "2", "3", "F", "T", "TOPCARD"],
                            ["07 c", "06 c", "05 c", "04 c", "03 c", "02 c", "01 c"])
         self.updateLists("T", "NA", 2)
 
         # Move & Update
-        self.calculateMove(["08", "c", "0", "3", "F", "T", "NO"],
+        self.calculateMove(["08", "c", "0", "3", "F", "T", "TOPCARD"],
                            ["08 c", "07 c", "06 c", "05 c", "04 c", "03 c", "02 c", "01 c"])
         self.updateLists("T", "NA", 0)
 
         # Move & Update
-        self.calculateMove(["09", "h", "0", "1", "F", "T", "NO"],
+        self.calculateMove(["09", "h", "0", "1", "F", "T", "TOPCARD"],
                            ["09 h", "08 h", "07 h", "06 h", "05 h", "04 h", "03 h", "02 h", "01 h"])
         self.updateLists("T", "NA", 0)
 
@@ -403,7 +403,7 @@ class TestGameLogic(TestCase):
         self.updateLists("T", "NA", 2)
 
         # Move & Update
-        self.calculateMove(["09", "s", "2", "2", "F", "T", "NO"],
+        self.calculateMove(["09", "s", "2", "2", "F", "T", "TOPCARD"],
                            ["09 s", "08 s", "07 s", "06 s", "05 s", "04 s", "03 s", "02 s", "01 s"])
         self.updateLists("T", "NA", 2)
 
@@ -413,7 +413,7 @@ class TestGameLogic(TestCase):
         self.updateLists("T", "NA", 3)
 
         # Move & Update
-        self.calculateMove(["09", "d", "4", "0", "F", "T", "NO"],
+        self.calculateMove(["09", "d", "4", "0", "F", "T", "TOPCARD"],
                            ["09 d", "08 d", "07 d", "06 d", "05 d", "04 d", "03 d", "02 d", "01 d"])
         self.updateLists("T", "NA", 4)
 
@@ -453,17 +453,17 @@ class TestGameLogic(TestCase):
         self.updateLists("W", "NA", -1)
 
         # Move & Update
-        self.calculateMove(["10", "c", "0", "3", "F", "T", "NO"],
+        self.calculateMove(["10", "c", "0", "3", "F", "T", "TOPCARD"],
                            ["10 c", "09 c", "08 c", "07 c", "06 c", "05 c", "04 c", "03 c", "02 c", "01 c"])
         self.updateLists("T", "NA", 0)
 
         # Move & Update
-        self.calculateMove(["11", "h", "0", "1", "F", "T", "NO"],
+        self.calculateMove(["11", "h", "0", "1", "F", "T", "TOPCARD"],
                            ["11 h", "10 h", "09 h", "08 h", "07 h", "06 h", "05 h", "04 h", "03 h", "02 h", "01 h"])
         self.updateLists("T", "NA", 0)
 
         # Move & Update
-        self.calculateMove(["12", "s", "0", "2", "F", "T", "NO"],
+        self.calculateMove(["12", "s", "0", "2", "F", "T", "TOPCARD"],
                            ["12 s", "11 s", "10 s", "09 s", "08 s", "07 s", "06 s", "05 s", "04 s", "03 s", "02 s",
                             "01 s"])
         self.updateLists("T", "NA", 0)
@@ -476,12 +476,12 @@ class TestGameLogic(TestCase):
         self.updateLists("T", "NA", 0)
 
         # Move & Update
-        self.calculateMove(["11", "c", "2", "3", "F", "T", "NO"],
+        self.calculateMove(["11", "c", "2", "3", "F", "T", "TOPCARD"],
                            ["11 c", "10 c", "09 c", "08 c", "07 c", "06 c", "05 c", "04 c", "03 c", "02 c", "01 c"])
         self.updateLists("T", "NA", 2)
 
         # Move & Update
-        self.calculateMove(["12", "h", "2", "1", "F", "T", "NO"],
+        self.calculateMove(["12", "h", "2", "1", "F", "T", "TOPCARD"],
                            ["12 h", "11 h", "10 h", "09 h", "08 h", "07 h", "06 h", "05 h", "04 h", "03 h", "02 h",
                             "01 h"])
         self.updateLists("T", "NA", 2)
@@ -493,7 +493,7 @@ class TestGameLogic(TestCase):
         self.updateLists("T", "NA", 3)
 
         # Move & Update
-        self.calculateMove(["12", "c", "4", "3", "F", "T", "NO"],
+        self.calculateMove(["12", "c", "4", "3", "F", "T", "TOPCARD"],
                            ["12 c", "11 c", "10 c", "09 c", "08 c", "07 c", "06 c", "05 c", "04 c", "03 c", "02 c",
                             "01 c"])
         self.updateLists("T", "NA", 4)
@@ -512,6 +512,132 @@ class TestGameLogic(TestCase):
 
         self.calculateMove(["WIN", "WIN", "WIN", "WIN", "WIN", "WIN", "WIN"],
                            ["NA", "NA", "NA", "NA", "NA"])
+
+    def test_play_game_two(self):
+        gl = create_empty_object()
+        waste_card_pile_actual = []
+        tableau_actual = create_list(["12 d"], ["03 d"], ["01 d"], ["11 c"], ["05 d"], ["10 d"], ["09 c"])
+        foundation_actual = create_list([], [], [], [])
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        list_of_moves = [["01", "d", "2", "0", "F", "T", "YES"],
+                         ["01", "c", "2", "1", "F", "T", "YES"],
+                         ["11", "c", "3", "0", "T", "T", "YES"],
+                         ["05", "d", "4", "3", "T", "T", "YES"],
+                         ["08", "h", "4", "6", "T", "T", "YES"],
+                         ["10", "d", "5", "0", "T", "T", "YES"],
+                         ["09", "c", "6", "0", "T", "T", "YES"],
+                         ["02", "h", "2", "6", "T", "T", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["02", "c", "-1", "1", "F", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["04", "c", "-1", "3", "T", "W", "YES"],
+                         ["03", "d", "1", "3", "T", "T", "YES"],
+                         ["12", "d", "0", "1", "T", "T", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["07", "c", "-1", "1", "T", "W", "YES"],
+                         ["06", "d", "4", "1", "T", "T", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["06", "h", "-1", "4", "T", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["11", "d", "-1", "5", "T", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["01", "s", "-1", "2", "F", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["05", "c", "-1", "1", "T", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["02", "s", "-1", "2", "F", "W", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["02", "d", "-1", "0", "F", "W", "YES"],
+                         ["03", "d", "3", "0", "F", "T", "TOPCARD"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["01", "h", "-1", "3", "F", "W", "YES"],
+                         ["02", "h", "6", "3", "F", "T", "TOPCARD"],
+                         ["03", "c", "6", "1", "F", "T", "YES"],
+                         ["04", "c", "3", "1", "F", "T", "TOPCARD"],
+                         ["05", "c", "1", "1", "F", "T", "TOPCARD"],
+                         ["03", "s", "6", "2", "F", "T", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "YES"],
+                         ["06", "c", "-1", "1", "F", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["10", "c", "-1", "5", "T", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["04", "d", "-1", "0", "F", "W", "NO"],
+                         ["05", "d", "3", "0", "F", "T", "TOPCARD"],
+                         ["06", "d", "1", "0", "F", "T", "TOPCARD"],
+                         ["07", "c", "1", "1", "F", "T", "TOPCARD"],
+                         ["07", "s", "4", "1", "T", "T", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["03", "h", "-1", "3", "F", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["07", "d", "-1", "0", "F", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["05", "h", "-1", "3", "T", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["08", "c", "-1", "1", "F", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["09", "h", "-1", "5", "T", "W", "NO"],
+                         ["08", "s", "6", "5", "T", "T", "YES"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["04", "h", "-1", "3", "F", "W", "NO"],
+                         ["05", "h", "3", "3", "F", "T", "TOPCARD"],
+                         ["06", "h", "1", "3", "F", "T", "TOPCARD"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["08", "d", "-1", "0", "F", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["NA", "NA", "NA", "NA", "NA", "W", "NO"],
+                         ["LOSE", "LOSE", "LOSE", "LOSE", "LOSE", "LOSE", "LOSE"],
+                         ]
+        list_of_updates = [create_list([],[],["01 c"],[],[],[],[]),
+                           create_list([],[],["02 h"],[],[],[],[]),
+                           create_list([],[],[],["06 s"],[],[],[]),
+                           create_list([],[],[],[],["08 h"],[],[]),
+                           create_list([],[],[],[],["06 d"],[],[]),
+                           create_list([],[],[],[],[],["12 c"],[]),
+                           create_list([],[],[],[],[],[],["03 c"]),
+                           create_list([],[],[],[],[],[],[]),
+                           "08 d", "02 c", None, "10 c", "04 d", "09 s", "03 h", "07 d", "04 c", None,
+                           create_list([], ["13 c"], [], [], [], [], []),
+                           create_list([], [], [], [], [], [], []),
+                           "05 h", "10 h", "08 c", "09 h", "12 c", "07 c", None,
+                           create_list([], [], [], [], ["07 s"], [], []), None,
+                           "06 h", None, "11 d", None, "01 s", None, "04 h", "11 s", "05 c", None, "02 s",
+                           None, "02 d", None, None, "01 h", None, None,
+                           create_list([], [], [], [], [], [], ["03 s"]), None, None,
+                           create_list([], [], [], [], [], [], ["08 s"]),
+                           "06 c", None, None, None, None, None, None, None, None, None,
+                           create_list([], [], [], [], ["13 s"], [], []), None, None, None, None, None,
+                           None, None, None, None, None, None, None,
+                           create_list([], [], [], [], [], [], ["10 s"]), None,
+                           None, None, None, None, None, None, None, None, None, None, None
+                           ]
+        for i in range(len(list_of_moves)):
+            self.assertListEqual(gl.calculate_move(), list_of_moves[i])
+            gl.update_logic_move(gl.calculate_move())
+            if list_of_moves[i][5] == "T" and list_of_moves[i][0] != "NA":
+                gl.update_logic_scan(None, list_of_updates[i], None)
+            else:
+                gl.update_logic_scan(list_of_updates[i], None, None)
 
     # TC01 - Test Case (Opdater via scan)
     def test_update_logic_scan(self):
@@ -587,6 +713,7 @@ class TestGameLogic(TestCase):
             self.assertEqual(len(gl.logicFoundationCardPiles.get(rand_index)), len(foundation_actual.get(rand_index)))
         return
 
+    # TC02 - Test Case (Opdater via træk)
     def test_update_logic_move(self):
         gl = create_empty_object()
         waste_card_pile_actual = ["11 c", "02 s", "01 h"]
@@ -639,47 +766,7 @@ class TestGameLogic(TestCase):
         self.assertEqual(gl.unknownTableau[5], 4)
         self.assertEqual(gl.unknownTableau[6], 5)
 
-    def calculateMove(self, trueMove, trueResult):
-        move = self.gl.calculate_move()
-        # Calculates the move
-        self.assertListEqual(move, trueMove)
-        # Updates the logic with regards to the move made
-        self.assertListEqual(self.gl.update_logic_move(move), trueResult)
-
-    def updateLists(self, whereTo, card, index):
-        if whereTo == "T":
-            taaa = (copy.deepcopy(self.gl.logicTableauCardPiles))
-            if card != "NA":
-                taaa.get(index).append(card)
-                if index == 0:
-                    tb = create_list([card], [], [], [], [], [], [])
-                if index == 1:
-                    tb = create_list([], [card], [], [], [], [], [])
-                if index == 2:
-                    tb = create_list([], [], [card], [], [], [], [])
-                if index == 3:
-                    tb = create_list([], [], [], [card], [], [], [])
-                if index == 4:
-                    tb = create_list([], [], [], [], [card], [], [])
-                if index == 5:
-                    tb = create_list([], [], [], [], [], [card], [])
-                if index == 6:
-                    tb = create_list([], [], [], [], [], [], [card])
-            else:
-                tb = create_list([], [], [], [], [], [], [])
-            _, taa, _ = self.gl.update_logic_scan(None, tb, None)
-            self.assertDictEqual(taa, taaa)
-        if whereTo == "W":
-            waaa = (copy.deepcopy(self.gl.logicWasteCardPile))
-            if card != "NA":
-                if card not in waaa:
-                    waaa.append(card)
-                wa = card
-            else:
-                wa = None
-            waa, _, _ = self.gl.update_logic_scan(wa, None, None)
-            self.assertListEqual(waa, waaa)
-
+    # TC03 - Test Case (Kalkuler et træk)
     def test_calculate_move(self):
         gl = create_empty_object()
         waste_card_pile_actual = ["08 s", "12 c", "03 c", "03 d", "09 d"]
@@ -697,10 +784,17 @@ class TestGameLogic(TestCase):
                                 ["08", "s", "-1", "0", "T", "W", "YES"], ["NA", "NA", "NA", "NA", "NA", "W", "YES"]]
         for i in range(len(list_of_actual_moves)):
             self.assertListEqual(gl.calculate_move(), list_of_actual_moves[i])
-            actual_unknown_tableau = copy.deepcopy(gl.unknownTableau)
             gl.update_logic_move(gl.calculate_move())
-            if int(list_of_actual_moves[i][2]) != -1:
-                self.assertEqual(gl.unknownTableau[int(list_of_actual_moves[i][2])], actual_unknown_tableau[int(list_of_actual_moves[i][2])] - 1)
+
+    # Test prioriteter
+    def test_priorities(self):
+        gl = create_empty_object()
+        waste_card_pile_actual = []
+        tableau_actual = create_list(["06 c"], ["06 s"], ["07 d"], [], [], [], [])
+        foundation_actual = create_list([], [], [], [])
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        self.assertListEqual(gl.calculate_move(), ["06", "s", "1", "2", "T", "T", "YES"])
 
     def test_check_foundation_card_pile(self):
         self.insertVariables(0)
@@ -761,6 +855,47 @@ class TestGameLogic(TestCase):
         self.logicFoundationCardPiles = {0: list0, 1: list00, 2: list000, 3: list0000}
 
         self.gl = GameLogic.GameLogic(self.logicWasteCard, self.logicTableauCardPiles, self.logicFoundationCardPiles)
+
+    def calculateMove(self, trueMove, trueResult):
+        move = self.gl.calculate_move()
+        # Calculates the move
+        self.assertListEqual(move, trueMove)
+        # Updates the logic with regards to the move made
+        self.assertListEqual(self.gl.update_logic_move(move), trueResult)
+
+    def updateLists(self, whereTo, card, index):
+        if whereTo == "T":
+            taaa = (copy.deepcopy(self.gl.logicTableauCardPiles))
+            if card != "NA":
+                taaa.get(index).append(card)
+                if index == 0:
+                    tb = create_list([card], [], [], [], [], [], [])
+                if index == 1:
+                    tb = create_list([], [card], [], [], [], [], [])
+                if index == 2:
+                    tb = create_list([], [], [card], [], [], [], [])
+                if index == 3:
+                    tb = create_list([], [], [], [card], [], [], [])
+                if index == 4:
+                    tb = create_list([], [], [], [], [card], [], [])
+                if index == 5:
+                    tb = create_list([], [], [], [], [], [card], [])
+                if index == 6:
+                    tb = create_list([], [], [], [], [], [], [card])
+            else:
+                tb = create_list([], [], [], [], [], [], [])
+            _, taa, _ = self.gl.update_logic_scan(None, tb, None)
+            self.assertDictEqual(taa, taaa)
+        if whereTo == "W":
+            waaa = (copy.deepcopy(self.gl.logicWasteCardPile))
+            if card != "NA":
+                if card not in waaa:
+                    waaa.append(card)
+                wa = card
+            else:
+                wa = None
+            waa, _, _ = self.gl.update_logic_scan(wa, None, None)
+            self.assertListEqual(waa, waaa)
 
 
 def create_list(li0, li1, li2, li3, li4=None, li5=None, li6=None):
