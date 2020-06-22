@@ -796,6 +796,14 @@ class TestGameLogic(TestCase):
 
         self.assertListEqual(gl.calculate_move(), ["06", "s", "1", "2", "T", "T", "YES"])
 
+        gl = create_empty_object()
+        waste_card_pile_actual = []
+        tableau_actual = create_list([], ["06 s"], ["07 d"], ["06 c"], [], [], [])
+        foundation_actual = create_list([], [], [], [])
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        self.assertListEqual(gl.calculate_move(), ["06", "s", "1", "2", "T", "T", "YES"])
+
     def test_check_foundation_card_pile(self):
         self.insertVariables(0)
 
