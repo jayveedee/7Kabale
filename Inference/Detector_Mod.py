@@ -62,7 +62,7 @@ def detect_card(some_prediction):
     #    list_of_piles_only_containing_newly_detected_cards[current_pile].append(card_name)
         # list_of_piles[current_pile].append(card_name)
 
-    if current_pile > 6 and not 11:
+    if 6 < current_pile < 11:
         foundation_piles.get(current_pile-7).append(card_name)
     elif current_pile < 7:
         tableu_piles.get(current_pile).append(card_name)
@@ -74,7 +74,6 @@ def detect_card(some_prediction):
 
         if game_logic.unknownWaste == 0:
             game_logic.allUnknownWasteFound = True #HMMMMM, dette kommer måske ikke til at virke.
-            print(game_logic.allUnknownWasteFound)
         waste_pile.append(card_name)
 
     sortLists(tableu_piles, foundation_piles, waste_pile)
@@ -127,17 +126,28 @@ def show_detected_cards(some_image):
     # print(waste_pile)
 
     #TODO: Fix that foundation piles shows the waste card piles
-    if current_pile > 6 and not 11:
+    if 6 < current_pile < 11:
+        some_range = range(6)
         pile = foundation_piles.get(current_pile-7)
     elif current_pile < 7:
+        some_range = range(6)
         pile = tableu_piles.get(current_pile)
     else:
+        some_range = reversed(range(6))
         pile = waste_pile
 
     if pile is not None:
-        for card in pile:
-            list_of_detected_cards += card
-            list_of_detected_cards += ", "
+        if len(pile) > 7:
+            list_of_detected_cards += "..."
+            for i in some_range:
+                list_of_detected_cards += pile[len(pile)-i-1]  # we get the last/first 6 cards if there is no space for all.
+                list_of_detected_cards += ", "
+        else:
+            for card in pile:
+                list_of_detected_cards += card
+                list_of_detected_cards += ", "
+
+
 
     cv2.putText(some_image, list_of_detected_cards, (0, 200), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
 
@@ -152,7 +162,8 @@ def show_text(some_image, move):
         cv2.putText(some_image, "'e' to confirm move", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
                     (209, 80, 0, 255), 2)"""
 
-    if move is not None and move[0] is not "NA":
+    # if move is not None and move[0] is not "NA":
+    if is_confirming_move:
         cv2.putText(some_image, "'e' to confirm move", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
                     (209, 80, 0, 255), 2)
     else:
@@ -186,9 +197,12 @@ def show_move(move, some_image):
     if game_has_just_started:
         move_text = "Scan first card of each pile"
     else:
-        if move is None or move[0] == "NA":
+
+        """if move is None or move[0] == "NA":
+            move_text = "No move. Scan from waste/flip cards."""
+        if not is_confirming_move:
             move_text = "No move. Scan from waste/flip cards."
-        else:
+        elif move[0] != "NA":
             card_number = move[0]
             card_suit = move[1]
             from_pile = move[2]
@@ -225,7 +239,7 @@ def change_pile():
 
 
 def clear_current_pile():
-    if current_pile > 6 and not 11:
+    if 6 < current_pile < 11:
         pile = foundation_piles[current_pile-7]
     elif current_pile < 7:
         pile = tableu_piles[current_pile]
@@ -264,7 +278,7 @@ def done_scanning():
     global game_logic
     global list_of_piles
 
-    print(game_logic.unknownWaste)
+    # print(game_logic.unknownWaste)
     #if game_logic.unknownWaste == 0:
      #   print(game_logic.unknownWasteCounter)
 
@@ -318,6 +332,7 @@ def done_scanning():
         #    list_of_piles_only_containing_newly_detected_cards[pile].clear()
 
     move = game_logic.calculate_move()
+    print(move)
     game_logic.update_logic_move(move)
     """list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards = game_logic.get_piles()
 
@@ -349,12 +364,17 @@ def check_for_unknown_cards(move):
 
 
 def check_for_win_condition(move):
+    global game_has_ended
     if move is None:
         return
 
     if move[0] == "WIN":
-        global game_has_ended
         print("You have won, closing now")
+        game_has_ended = True
+        return
+
+    if move[0] == "LOSE":
+        print("You have lost, closing now")
         game_has_ended = True
         return
 
@@ -442,6 +462,11 @@ game_logic = GameLogic.GameLogic(None, None, None)
 # there_are_unknown_cards = False
 
 while not game_has_ended:
+
+    if some_move is not None:
+        if some_move[0] == "NA":
+            is_confirming_move = False
+
     # print(list_of_piles)
 
     # Getting the piles from the logic.
@@ -504,29 +529,21 @@ while not game_has_ended:
     if k == 32 and not is_confirming_move:  # When 'SPACE' is pressed we change pile
         change_pile()
     if k == 101:  # When 'e' is pressed, we stop scanning or confirm move
-        """if not is_confirming_move:
-            if not there_are_unknown_cards:
-                some_move = done_scanning()
-                if some_move[0] != "NA":
-                    is_confirming_move = True
-        else:
-            if check_for_unknown_cards(some_move):
-                is_confirming_move = False
-                some_move = None
-                there_are_unknown_cards = True
-            else:
-                some_move = done_scanning()
-                if some_move[0] == "NA":
-                    is_confirming_move = False"""
-
+        print("Just pressed e")
         if not is_confirming_move:
             some_move = done_scanning()
             if some_move[0] != "NA":
                 is_confirming_move = True
         else:
-            some_move = done_scanning()
-            if some_move[0] == "NA":
+            """if some_move[0] == "NA" or (some_move[6] == "YES" and some_move[5] != "W"): #TODO: FIX WHEN IT IS THE WASTE CARD
+                # TODO: EOW PRINT EN 6'SER YO
+                is_confirming_move = False"""
+            if some_move[6] == "YES" and some_move[5] != "W": #TODO: FIX WHEN IT IS THE WASTE CARD
+                # TODO: EOW PRINT EN 6'SER YO
                 is_confirming_move = False
+            else:
+                some_move = done_scanning()
+
 
     check_for_win_condition(some_move)
     show_text(final_image, some_move)
