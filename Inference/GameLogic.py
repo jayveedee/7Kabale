@@ -4,6 +4,8 @@ def variable_check(card_number, unknowns):
         card_number_string = "0" + card_number_string
     if unknowns == -1:
         scan = "NO"
+    elif unknowns == -2:
+        scan = "TOPCARD"
     else:
         scan = "YES"
     return card_number_string, scan
@@ -16,6 +18,18 @@ def check_how_many_cards_to_move(move_from_list, moved_card, tableau_pile_moved_
         if move_from_list:
             tableau_pile_moved_to.append(tableau_pile_moved_from[i])
             tableau_pile_moved_from.pop(i)
+
+
+def check_card_type_matches(card_type, neighbor_card_type, n=0):
+    if n == 0:
+        if ((card_type == "d" or card_type == "h") and (neighbor_card_type == "c" or neighbor_card_type == "s")) or \
+                ((card_type == "c" or card_type == "s") and (neighbor_card_type == "d" or neighbor_card_type == "h")):
+            return True
+    if n == 1:
+        if ((card_type == "d" or card_type == "h") and (neighbor_card_type == "d" or neighbor_card_type == "h")) or \
+                ((card_type == "c" or card_type == "s") and (neighbor_card_type == "c" or neighbor_card_type == "s")):
+            return True
+    return False
 
 
 class GameLogic:
@@ -39,22 +53,12 @@ class GameLogic:
                 self.logicWasteCardPile = logic_waste_card
             if logic_tableau_card_piles is not None:
                 self.logicTableauCardPiles = logic_tableau_card_piles
-            else:
-                self.logicTableauCardPiles = {0:[],
-                                              1:[],
-                                              2:[],
-                                              3:[],
-                                              4:[],
-                                              5:[],
-                                              6:[]}
+            else: self.logicTableauCardPiles = {0:[],1:[],2:[],3:[],4:[],5:[],6:[]}
             if logic_foundation_card_piles is not None:
                 self.logicFoundationCardPiles = logic_foundation_card_piles
-            else:
-                self.logicFoundationCardPiles = {0:[],
-                                              1:[],
-                                              2:[],
-                                              3:[]}
+            else: self.logicFoundationCardPiles = {0:[],1:[],2:[],3:[]}
             self.unknownWaste = 24
+            self.unknownTableau.clear()
             for i in range(7):
                 counter = 0
                 for j in range(i):
@@ -82,7 +86,7 @@ class GameLogic:
 
         self.result = []
 
-        if move[0] != "NA" and move[0] != "WIN":
+        if move[0] != "NA" and move[0] != "WIN" and move[0] != "LOSE":
 
             move_from_list = False
 
@@ -121,10 +125,8 @@ class GameLogic:
                 for j in range(len(self.logicTableauCardPiles)):
                     neighbor_pile = self.logicTableauCardPiles.get(j)
 
-                    unknowns = self.check_unknown_cards(i)
-
-                    empty_space = self.check_empty_spaces(card_number, card_type, current_pile, i, j, neighbor_pile, unknowns)
-                    if empty_space is "King":
+                    empty_space = self.check_empty_spaces(card_number, card_type, current_pile, i, j, neighbor_pile)
+                    if empty_space is "King" or empty_space is "Foundation":
                         return self.result
                     elif empty_space is False:
                         if current_pile[0] != neighbor_pile[0]:
@@ -139,10 +141,33 @@ class GameLogic:
                                     if self.check_sub_pile_placement(current_pile, i, j, k, next_card_number, next_card_type, sub_card_number, sub_card_type):
                                         return self.result
 
-                            if self.check_tableau_placement(card_number, card_type, current_pile, i, j, next_card_number, next_card_type):
-                                return self.result
+                            priority = self.check_priority_one(current_pile, i)
+
+                            if priority == "NA":
+                                if self.check_tableau_placement(card_number, card_type, current_pile, i, j, next_card_number, next_card_type):
+                                    return self.result
+                            else:
+                                break
 
         return self.check_waste_card_placement()
+
+    def check_priority_one(self, current_pile, i):
+        if self.unknownTableau[i] == 0:
+            sub_current_card_number, sub_current_card_type, _ = self.define_card(i, len(current_pile) - 1, "T")
+            for k in range(len(self.logicTableauCardPiles)):
+                sub_next_pile = self.logicTableauCardPiles.get(k)
+
+                if len(sub_next_pile) != 0 and sub_next_pile != current_pile:
+                    sub_next_card_number, sub_next_card_type, _ = self.define_card(k, len(sub_next_pile) - 1, "T")
+
+                    if check_card_type_matches(sub_current_card_type, sub_next_card_type, 1):
+                        if sub_current_card_number == sub_next_card_number and self.unknownTableau[k] != 0:
+                            return "P1"
+
+                    # TODO FIX CARDS BEING PUT ON FOUNDATION BEFORE CHECKING IF A CARD CAN BE PLACED ON THE CURRENT CARD TO REVEAL A UNKNOWN CARD
+                    # if self.check_priority_two()
+                    #     return "P2"
+        return "NA"
 
     def check_tableau_placement(self, card_number, card_type, current_pile, i, j, next_card_number, next_card_type):
         unknowns = self.check_unknown_cards(i)
@@ -175,15 +200,23 @@ class GameLogic:
                     return True
         return False
 
-    def check_empty_spaces(self, card_number, card_type, current_pile, i, j, neighbor_pile, unknowns):
+    def check_empty_spaces(self, card_number, card_type, current_pile, i, j, neighbor_pile):
+        unknowns = self.unknownTableau[i]
+
+        if len(current_pile) > 1:
+            unknowns = -2
+        if unknowns == 0:
+            unknowns = -1
+
         if len(neighbor_pile) == 0:
             if self.unknownTableau[j] == 0:
                 if self.check_card_placement(i, card_number, card_type, j, -1, "-1", False, unknowns, "T"):
-                    return "King"
+                    return "Foundation"
                 last_index = len(current_pile) - 1
                 if current_pile[last_index] == "13 d" or current_pile[last_index] == "13 c" or \
                         current_pile[last_index] == "13 s" or current_pile[last_index] == "13 h":
                     king_card_number, king_card_type, _ = self.define_card(i, last_index, "T")
+                    unknowns = self.unknownTableau[i]
                     if self.check_card_placement(i, king_card_number, king_card_type, j, -1, "-1", True, unknowns, "T"):
                         return "King"
             return True
@@ -272,29 +305,33 @@ class GameLogic:
 
     def check_waste_card_placement(self):
         if self.logicWasteCardPile is not None:
-            if len(self.logicWasteCardPile) != 0:
-                if self.unknownWasteCounter != -1:
-
-                    waste_card_number, waste_card_type = self.check_if_all_waste_cards_found()
-                    unknowns = self.check_unknown_cards(-1)
-
-                    for i in range(len(self.logicTableauCardPiles)):
-
-                        if len(self.logicTableauCardPiles.get(i)) > 0:
-
-                            next_card_number, next_card_type, _ = self.define_card(i, 0, "T")
-
-                            if self.check_card_placement(-1, waste_card_number, waste_card_type, i, next_card_number, next_card_type, False, unknowns, "W"):
-                                return self.result
-
-                        elif len(self.logicTableauCardPiles.get(i)) == 0 and waste_card_number == 13:
-                            if self.check_card_placement(-1, waste_card_number, waste_card_type, i, -1, "-1", False, unknowns, "W"):
-                                return self.result
+            if self.handle_waste_card_check():
+                return self.result
         if self.unknownWaste != 0:
             return ["NA", "NA", "NA", "NA", "NA", "W", "YES"]
         else:
             self.loseCounter += 1
             return ["NA", "NA", "NA", "NA", "NA", "W", "NO"]
+
+    def handle_waste_card_check(self):
+        if len(self.logicWasteCardPile) != 0 and self.unknownWasteCounter != -1:
+            waste_card_number, waste_card_type = self.check_if_all_waste_cards_found()
+            unknowns = self.check_unknown_cards(-1)
+
+            for i in range(len(self.logicTableauCardPiles)):
+
+                current_pile = self.logicTableauCardPiles.get(i)
+                if len(current_pile) > 0:
+
+                    next_card_number, next_card_type, _ = self.define_card(i, 0, "T")
+
+                    if self.check_card_placement(-1, waste_card_number, waste_card_type, i, next_card_number, next_card_type, False, unknowns, "W"):
+                        return True
+
+                elif len(current_pile) == 0 and waste_card_number == 13:
+                    if self.check_card_placement(-1, waste_card_number, waste_card_type, i, -1, "-1", False, unknowns, "W"):
+                        return True
+        return False
 
     def check_if_all_waste_cards_found(self):
         if self.allUnknownWasteFound:
@@ -305,10 +342,10 @@ class GameLogic:
             waste_card_number, waste_card_type, _ = self.define_card(len(self.logicWasteCardPile) - 1, 0, "W")
         return waste_card_number, waste_card_type
 
-    def check_card_placement(self, i, card_number, card_type, j, neighbor_card_number, neighbor_card_type, is_sub_card, unknowns=0, move_type=""):
+    def check_card_placement(self, i, card_number, card_type, j, neighbor_card_number, neighbor_card_type, is_sub_card, unknowns=0, move_type="", priority=0):
         card_number_string, scan = variable_check(card_number, unknowns)
 
-        if card_number <= 13:
+        if card_number <= 13 and priority == 0:
 
             exists_in_foundation = self.check_foundation_card_pile(card_number, card_type)
 
@@ -316,21 +353,16 @@ class GameLogic:
                 if exists_in_foundation > -1:
                     self.create_move(card_number_string, card_type, i, exists_in_foundation, "F", move_type, scan)
                     return True
-
             if neighbor_card_type == "-1" and neighbor_card_number == -1 and card_number == 13 and (
                     unknowns > 0 or move_type == "W"):
                 self.create_move(card_number_string, card_type, i, j, "T", move_type, scan)
                 return True
 
             if neighbor_card_number > 0:
-
-                if ((card_type == "d" or card_type == "h") and (neighbor_card_type == "c" or neighbor_card_type == "s")) or \
-                        ((card_type == "c" or card_type == "s") and (neighbor_card_type == "d" or neighbor_card_type == "h")):
-
+                if check_card_type_matches(card_type, neighbor_card_type, 0):
                     if neighbor_card_number - 1 == card_number:
                         self.create_move(card_number_string, card_type, i, j, "T", move_type, scan)
                         return True
-
         return False
 
     def define_card(self, i, k, pile_type):
@@ -397,13 +429,3 @@ class GameLogic:
     def get_piles(self):
         return self.logicTableauCardPiles, self.logicFoundationCardPiles, self.logicWasteCardPile
 
-    def get_unknown_counter(self):
-        return self.unknownWaste
-
-    def increment_counter(self):
-        global counter
-        counter += 1
-
-    def get_counter(self):
-        global counter
-        return counter
