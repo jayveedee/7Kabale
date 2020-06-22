@@ -812,6 +812,106 @@ class TestGameLogic(TestCase):
         self.assertEqual(self.gl.check_foundation_card_pile(6, "s"), -1)
         self.assertEqual(self.gl.check_foundation_card_pile(3, "c"), -1)
 
+    def test_simulate_many_games(self):
+        number_of_games = 100
+        number_of_wins = 0
+
+        print(f"Going to play {number_of_games} games. Please wait")
+
+        for i in range(number_of_games):
+            # start game
+            game_logic = create_empty_object()
+            game_is_running = True
+
+            # setup a game
+            tableu_piles, foundation_piles, waste_pile = self.setup_a_random_game()
+            waste_card = None
+
+            while game_is_running:
+                # play the game
+                """if len(waste_pile) == 0:
+                    game_logic.update_logic_scan(None, tableu_piles, foundation_piles)"""
+                if waste_card is None:
+                    game_logic.update_logic_scan(None, tableu_piles, foundation_piles)
+                else:
+                    game_logic.update_logic_scan(waste_pile[len(waste_pile)-1], tableu_piles, foundation_piles)
+                move = game_logic.calculate_move()
+                # print(move)
+                print(game_logic.unknownWaste)
+                game_logic.update_logic_move(move)
+
+                # checking what type of move it was
+                if move[0] != "NA":
+                    # check for win/lose:
+                    if move[0] == "WIN":
+                        number_of_wins += 1
+                        game_is_running = False
+                        continue
+
+                    if move[0] == "LOSE":
+                        game_is_running = False
+                        continue
+
+                    if move[6] == "YES":
+                        # We have to 'turn' an unknown card, which means that we need to add a random card.
+                        pile_number = int(move[2])
+                        if pile_number != -1:
+                            # we add a random card to the correct tableu pile
+                            card = self.get_random_card()
+                            if card is not None:
+                                tableu_piles[pile_number].append(card)
+
+                else:
+                    if move[6] == "YES":
+                        # we have to pull a card from the waste card pile
+                        card = self.get_random_card()
+                        if card is not None:
+                            waste_pile.append(card)
+                            waste_card = card
+
+
+            # on finish
+            print(f"Number of games played: {i}")
+
+        print(f"Number of wins: {number_of_wins} out of {number_of_games}")
+
+    def setup_a_random_game(self):
+        global dictionary_of_cards
+
+        # reset the dictionary from previous game
+        for key, value in dictionary_of_cards.items():
+            dictionary_of_cards[key] = False
+
+        # creating tableu piles:
+        tableu_piles = create_list([], [], [], [], [], [], [])
+        for i in range(7):
+            tableu_piles[i].append(self.get_random_card())
+
+        # creating foundation piles:
+        foundation_piles = create_list([],[],[],[])
+
+        # creating waste pile:
+        waste_pile = []
+        return tableu_piles, foundation_piles, waste_pile
+
+
+    def get_random_card(self):
+        # creating a list of cards that has not been taken.
+        list_of_possible_cards = []
+        for card, value in dictionary_of_cards.items():
+            if not value:
+                list_of_possible_cards.append(card)
+
+        # getting random index:
+        if len(list_of_possible_cards) != 0:
+            random_index = random.randrange(len(list_of_possible_cards))
+            card = list_of_possible_cards[random_index]
+            dictionary_of_cards[card] = True
+            return card
+        else:
+            return None
+
+
     def insertVariables(self, testNumber=0):
         self.logicWasteCard = []
         self.logicWasteCard.append("01 d")
@@ -929,3 +1029,59 @@ def create_empty_object():
     list1111111 = []
     tableau_piles = {0: list1, 1: list11, 2: list111, 3: list1111, 4: list11111, 5: list111111, 6: list1111111}
     return GameLogic.GameLogic(None, tableau_piles, foundation_piles)
+
+
+dictionary_of_cards = {
+    "08 c": False,
+    "13 s": False,
+    "05 c": False,
+    "12 h": False,
+    "07 s": False,
+    "11 h": False,
+    "02 c": False,
+    "07 h": False,
+    "01 d": False,
+    "02 h": False,
+    "11 c": False,
+    "06 d": False,
+    "04 h": False,
+    "07 d": False,
+    "12 c": False,
+    "04 s": False,
+    "08 d": False,
+    "05 h": False,
+    "06 c": False,
+    "05 d": False,
+    "07 c": False,
+    "03 h": False,
+    "10 h": False,
+    "13 d": False,
+    "06 h": False,
+    "09 d": False,
+    "08 s": False,
+    "09 c": False,
+    "03 c": False,
+    "02 s": False,
+    "10 s": False,
+    "09 h": False,
+    "04 c": False,
+    "13 c": False,
+    "12 d": False,
+    "04 d": False,
+    "05 s": False,
+    "10 c": False,
+    "09 s": False,
+    "13 h": False,
+    "12 s": False,
+    "02 d": False,
+    "11 d": False,
+    "01 c": False,
+    "03 s": False,
+    "01 s": False,
+    "10 d": False,
+    "08 h": False,
+    "06 s": False,
+    "11 s": False,
+    "03 d": False,
+    "01 h": False
+}
