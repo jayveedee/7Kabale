@@ -9,7 +9,7 @@ import copy
 class TestGameLogic(TestCase):
 
     # TC00 - Test Case (Spil et spil færdigt)
-    def test_play_game(self):
+    def test_play_game_one(self):
         tb = create_list(["06 h"], ["06 c"], ["13 d"], ["04 d"], ["03 h"], ["02 s"], ["08 c"])
         fd = {0: [], 1: [], 2: [], 3: []}
         wc = []
@@ -831,14 +831,17 @@ class TestGameLogic(TestCase):
                 # play the game
                 """if len(waste_pile) == 0:
                     game_logic.update_logic_scan(None, tableu_piles, foundation_piles)"""
-                if waste_card is None:
+                if game_logic.unknownWaste == 0:
                     game_logic.update_logic_scan(None, tableu_piles, foundation_piles)
                 else:
-                    game_logic.update_logic_scan(waste_pile[len(waste_pile)-1], tableu_piles, foundation_piles)
+                    game_logic.update_logic_scan(waste_card, tableu_piles, foundation_piles)
                 move = game_logic.calculate_move()
                 # print(move)
-                print(game_logic.unknownWaste)
+                # print(game_logic.unknownWaste)
                 game_logic.update_logic_move(move)
+
+                tableu_piles = create_list([], [], [], [], [], [], [])
+                foundation_piles = create_list([], [], [], [])
 
                 # checking what type of move it was
                 if move[0] != "NA":
@@ -871,7 +874,7 @@ class TestGameLogic(TestCase):
 
 
             # on finish
-            print(f"Number of games played: {i}")
+            print(f"Number of games played: {i + 1}")
 
         print(f"Number of wins: {number_of_wins} out of {number_of_games}")
 
