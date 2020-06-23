@@ -5,9 +5,14 @@ import cv2
 """
 This file is a modified version of the Detector.py from 
 the following repository: https://github.com/AntonMu/TrainYourOwnYOLO
-We have changed a lot to make the code fit our needs. 
+We have changed a lot to make the code fit our needs.
+
+Modifications made by Asama Hayder (s185099)
 """
 
+#EOW HUSK AT MARKERE HVILKE METODER DER ER VORES OG HVILKE DER ER FRA REPOEN.
+#OG HUSK AT SIGE TIL FÆRGEN AT HAN OGSÅ SKAL SKRIVE SIT NAVN PÅ SIN KODE
+#OG HUSK AT SKRIVE DIT NAVN PÅ SIMULATIONS-KODEN SAMMEN MED FÆRGEN!
 
 def get_parent_dir(n=1):
     """ returns the n-th parent directory of the current
@@ -82,6 +87,8 @@ def detect_card(some_prediction):
 
 
 def increment_card_viewed_counter(some_prediction):
+    number_of_times_a_card_should_be_seen_sequentially = 15
+
     card_name = dictionaryOfIndexToName.get(some_prediction[4])
 
     # checking if already detected
@@ -90,7 +97,7 @@ def increment_card_viewed_counter(some_prediction):
 
     number_of_times_viewed = dictionaryOfCardFrameCounter.get(card_name)
     number_of_times_viewed += 1
-    if number_of_times_viewed >= 10:
+    if number_of_times_viewed >= number_of_times_a_card_should_be_seen_sequentially:
         detect_card(some_prediction)
     else:
         dictionaryOfCardFrameCounter[card_name] = number_of_times_viewed
@@ -114,7 +121,8 @@ def check_if_card_already_detected(card_name):
     return detected
 
 
-def show_detected_cards(some_image):
+def show_detected_cards(some_image, font, text_size, text_thickness, border_color, border_thickness):
+    cards_color = (3, 186, 252, 255)
     list_of_detected_cards = "Cards: "
 
     """for some_name in list_of_piles[current_pile]:
@@ -147,16 +155,24 @@ def show_detected_cards(some_image):
                 list_of_detected_cards += card
                 list_of_detected_cards += ", "
 
-
-
-    cv2.putText(some_image, list_of_detected_cards, (0, 200), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
+    cv2.putText(some_image, list_of_detected_cards, (0, 200), font, text_size, border_color, border_thickness)
+    cv2.putText(some_image, list_of_detected_cards, (0, 200), font, text_size, cards_color, text_thickness)
 
     return
 
 
 # displays various text
 def show_text(some_image, move):
-    cv2.putText(some_image, "'ESC' to exit", (0, 30), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
+    text_color = (255, 255, 255, 255)  # remember it is in bgr
+    text_border_color = (0, 0, 0, 255)
+    text_size = .75
+    text_thickness = 1
+    border_thickness = 3 * text_thickness
+    font = cv2.FONT_HERSHEY_DUPLEX
+
+    cv2.putText(some_image, "'ESC' to exit", (0, 30), font, text_size, text_border_color, border_thickness)
+    cv2.putText(some_image, "'ESC' to exit", (0, 30), font, text_size, text_color, text_thickness)
+
 
     """if move is not None and move[0] is not "NA" and not there_are_unknown_cards:
         cv2.putText(some_image, "'e' to confirm move", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
@@ -164,30 +180,37 @@ def show_text(some_image, move):
 
     # if move is not None and move[0] is not "NA":
     if is_confirming_move:
-        cv2.putText(some_image, "'e' to confirm move", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
-                    (209, 80, 0, 255), 2)
+        cv2.putText(some_image, "'e' to confirm move", (0, 70), font, text_size, text_border_color, border_thickness)
+        cv2.putText(some_image, "'e' to confirm move", (0, 70), font, text_size, text_color, text_thickness)
     else:
-        cv2.putText(some_image, "'c' to clear current pile", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
-                    (209, 80, 0, 255), 2)
-        cv2.putText(some_image, "'SPACE' for next pile", (0, 110), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
-        cv2.putText(some_image, "'e' for done scanning", (0, 150), cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
-        current_pile_text = "current pile: "
+        cv2.putText(some_image, "'c' to clear pile", (0, 70), font, text_size, text_border_color, border_thickness)
+        cv2.putText(some_image, "'c' to clear pile", (0, 70), font, text_size, text_color, text_thickness)
+
+        cv2.putText(some_image, "'SPACE' for next pile", (0, 110), font, text_size, text_border_color, border_thickness)
+        cv2.putText(some_image, "'SPACE' for next pile", (0, 110), font, text_size, text_color, text_thickness)
+
+        cv2.putText(some_image, "'e' for done scanning", (0, 150), font, text_size, text_border_color, border_thickness)
+        cv2.putText(some_image, "'e' for done scanning", (0, 150), font, text_size, text_color, text_thickness)
+
+        pile_text = "current pile: "
         current_pile_name = dictionary_of_pile_names.get(current_pile)
-        current_pile_text += current_pile_name
-        text_size = cv2.getTextSize(current_pile_text, cv2.FONT_HERSHEY_DUPLEX, .75, 2)[0]
+        pile_text += current_pile_name
+        text_width = cv2.getTextSize(pile_text, cv2.FONT_HERSHEY_DUPLEX, .75, 2)[0]
         image_width = some_image.shape[1]
 
-        x_coordinate = image_width - text_size[0]
-        cv2.putText(some_image, current_pile_text, (x_coordinate, 30),
-                    cv2.FONT_HERSHEY_DUPLEX, .75, (209, 80, 0, 255), 2)
+        x_coordinate = image_width - text_width[0]
+        cv2.putText(some_image, pile_text, (x_coordinate, 30), font, text_size, text_border_color, border_thickness)
+        cv2.putText(some_image, pile_text, (x_coordinate, 30), font, text_size, text_color, text_thickness)
 
-        show_detected_cards(some_image)
-    show_move(move, some_image)
+        show_detected_cards(some_image, font, text_size, text_thickness, text_border_color, border_thickness)
+
+    show_move(move, some_image, font, text_size, text_thickness, text_border_color, border_thickness)
 
     return
 
 
-def show_move(move, some_image):
+def show_move(move, some_image, font, text_size, text_thickness, border_color, border_thickness):
+    move_color = (0, 255, 0, 255)
     # Creating the text that will be displayed
     global move_text
     # global there_are_unknown_cards
@@ -201,7 +224,7 @@ def show_move(move, some_image):
         """if move is None or move[0] == "NA":
             move_text = "No move. Scan from waste/flip cards."""
         if not is_confirming_move:
-            move_text = "No move. Scan from waste/flip cards."
+            move_text = "Scan from waste/flip cards."
         elif move[0] != "NA":
             card_number = move[0]
             card_suit = move[1]
@@ -215,14 +238,23 @@ def show_move(move, some_image):
     # print(move_text)
 
     # Calculating the coordinates and displaying the text
-    text_size = cv2.getTextSize(move_text, cv2.FONT_HERSHEY_DUPLEX, .75, 2)[0]
-    x_coordinate = (some_image.shape[1] - text_size[0])/2
-    y_coordinate = (some_image.shape[0] - text_size[1])
+    border_text_size = cv2.getTextSize(move_text, font, text_size, border_thickness)[0]
+    text_width = cv2.getTextSize(move_text, font, text_size, text_thickness)[0]
 
-    x_coordinate_rounded = int(round(x_coordinate))
-    y_coordinate_rounded = int(round(y_coordinate))
-    cv2.putText(some_image, move_text, (x_coordinate_rounded, y_coordinate_rounded), cv2.FONT_HERSHEY_DUPLEX, .75,
-                (0, 255, 0, 255), 2)
+    x_coordinate = (some_image.shape[1] - text_width[0])/2
+    y_coordinate = (some_image.shape[0] - text_width[1])
+    x_b_coordinate = (some_image.shape[1] - border_text_size[0])/2
+    y_b_coordinate = (some_image.shape[0] - border_text_size[1])
+
+    x_rounded = int(round(x_coordinate))
+    y_rounded = int(round(y_coordinate))
+    x_b_rounded = int(round(x_b_coordinate))
+    y_b_rounded = int(round(y_b_coordinate))
+
+    cv2.putText(some_image, move_text, (x_rounded, y_rounded), font, text_size,
+                border_color, border_thickness)
+    cv2.putText(some_image, move_text, (x_rounded, y_rounded), font, text_size,
+                move_color, text_thickness)
 
     return
 
@@ -521,7 +553,7 @@ while not game_has_ended:
         opencv_image = np.asarray(image)
         final_image = opencv_image
 
-    k = cv2.waitKey(30) & 0xff
+    k = cv2.waitKey(1) & 0xff
     if k == 27:  # When 'ESC' is pressed, we exit.
         break
     if k == 99 and not is_confirming_move:  # When 'c' is pressed we clear current pile
@@ -535,9 +567,6 @@ while not game_has_ended:
             if some_move[0] != "NA":
                 is_confirming_move = True
         else:
-            """if some_move[0] == "NA" or (some_move[6] == "YES" and some_move[5] != "W"): #TODO: FIX WHEN IT IS THE WASTE CARD
-                # TODO: EOW PRINT EN 6'SER YO
-                is_confirming_move = False"""
             if some_move[6] == "YES" and some_move[5] != "W": #TODO: FIX WHEN IT IS THE WASTE CARD
                 # TODO: EOW PRINT EN 6'SER YO
                 is_confirming_move = False
@@ -548,6 +577,7 @@ while not game_has_ended:
     check_for_win_condition(some_move)
     show_text(final_image, some_move)
     cv2.imshow('img', final_image)
+
 
 cv2.destroyAllWindows()
 video_stream.release()
