@@ -4,6 +4,7 @@ from Inference import GameLogic
 
 import random
 import copy
+import numpy as np
 
 
 class TestGameLogic(TestCase):
@@ -802,7 +803,7 @@ class TestGameLogic(TestCase):
         foundation_actual = create_list([], [], [], [])
         gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
 
-        self.assertListEqual(gl.calculate_move(), ["06", "s", "1", "2", "T", "T", "YES"])
+        self.assertListEqual(gl.calculate_move(), ["06", "c", "3", "2", "T", "T", "YES"])
 
         gl = create_empty_object()
         waste_card_pile_actual = []
@@ -810,7 +811,7 @@ class TestGameLogic(TestCase):
         foundation_actual = create_list([], ["06 d"], [], [])
         gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
 
-        self.assertListEqual(gl.calculate_move(), ["06", "s", "1", "0", "T", "T", "YES"])
+        self.assertListEqual(gl.calculate_move(), ["06", "c", "3", "0", "T", "T", "YES"])
 
         gl = create_empty_object()
         waste_card_pile_actual = []
@@ -819,6 +820,30 @@ class TestGameLogic(TestCase):
         gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
 
         self.assertListEqual(gl.calculate_move(), ["06", "c", "3", "0", "T", "T", "YES"])
+
+        gl = create_empty_object()
+        waste_card_pile_actual = []
+        tableau_actual = create_list(["05 c"], ["06 d"], ["06 h"], ["05 s"], [], [], [])
+        foundation_actual = create_list([], [], [], [])
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        self.assertListEqual(gl.calculate_move(), ["05", "s", "3", "1", "T", "T", "YES"])
+
+        gl = create_empty_object()
+        waste_card_pile_actual = []
+        tableau_actual = create_list(["05 c"], ["06 d"], ["05 s", "06 h"], ["01 s"], [], [], [])
+        foundation_actual = create_list([], [], [], [])
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        self.assertListEqual(gl.calculate_move(), ["01", "s", "3", "0", "F", "T", "YES"])
+
+        gl = create_empty_object()
+        waste_card_pile_actual = []
+        tableau_actual = create_list(["05 c"], ["13 d"], ["06 h"], [], [], [], [])
+        foundation_actual = create_list([], [], [], [])
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        self.assertListEqual(gl.calculate_move(), ["05", "c", "0", "2", "T", "T", "NO"])
 
     def test_check_foundation_card_pile(self):
         self.insertVariables(0)
@@ -829,10 +854,13 @@ class TestGameLogic(TestCase):
         self.assertEqual(self.gl.check_foundation_card_pile(3, "c"), -1)
 
     def test_simulate_many_games(self):
-        number_of_games = 100000
+        number_of_games = 100
         number_of_wins = 0
 
-        print(f"Simulating {number_of_games} solitaire games. Please wait...")
+        print(f"Simulating {number_of_games} solitaire games...")
+
+        # keeping track of games with all moves defined
+        list_of_games = []
 
         for i in range(number_of_games):
             # start game
@@ -840,32 +868,43 @@ class TestGameLogic(TestCase):
             game_is_running = True
 
             # setup a game
-            tableu_piles, foundation_piles, waste_pile = self.setup_a_random_game()
+            tableau_piles, foundation_piles, waste_pile = self.setup_a_random_game()
             waste_card = None
+
+            # keeping tack of moves in a game
+            list_of_moves = []
 
             while game_is_running:
                 # play the game
-                move = game_logic.calculate_move()
-                game_logic.update_logic_move(move)
                 if game_logic.unknownWaste == 0:
-                    game_logic.update_logic_scan(None, tableu_piles, foundation_piles)
+                    game_logic.update_logic_scan(None, tableau_piles, foundation_piles)
                 else:
-                    game_logic.update_logic_scan(waste_card, tableu_piles, foundation_piles)
+                    game_logic.update_logic_scan(waste_card, tableau_piles, foundation_piles)
+                move = game_logic.calculate_move(True)
+                game_logic.update_logic_move(move)
                 waste_card = None
 
-                tableu_piles = create_list([], [], [], [], [], [], [])
+                tableau_piles = create_list([], [], [], [], [], [], [])
                 foundation_piles = create_list([], [], [], [])
 
                 # checking what type of move it was
                 if move[0] != "NA":
+                    # adding moves to game tracker
+                    if move[4] == "T": placement = "Tableau"
+                    else: placement = "Foundation"
+                    if move[0] != "WIN" and move[0] != "LOSE":
+                        list_of_moves.append(f"Moving card [{move[0] + move[1]}] from pile [{move[2]}] to pile [{move[3]}] on the {placement}")
+
                     # check for win/lose:
                     if move[0] == "WIN":
                         number_of_wins += 1
                         game_is_running = False
+                        list_of_moves.append("You won!")
                         continue
 
                     if move[0] == "LOSE":
                         game_is_running = False
+                        list_of_moves.append("You lost!")
                         continue
 
                     if move[6] == "YES":
@@ -875,7 +914,7 @@ class TestGameLogic(TestCase):
                             # we add a random card to the correct tableu pile
                             card = self.get_random_card()
                             if card is not None:
-                                tableu_piles[pile_number].append(card)
+                                tableau_piles[pile_number].append(card)
 
                 else:
                     if move[6] == "YES":
@@ -887,11 +926,19 @@ class TestGameLogic(TestCase):
 
 
             # on finish
+            list_of_games.append(list_of_moves)
             if (i + 1) % (number_of_games/10) == 0:
-                print(f"Number of games played: {i + 1}")
+                print(f"{i + 1} games played")
 
-        print(f"Number of wins: {number_of_wins} out of {number_of_games}")
+        print(f"{number_of_wins} out of {number_of_games} wins")
         print(f"Win rate: {(number_of_wins / number_of_games) * 100}%")
+        print(f"Average number of moves: {self.game_moves_mean(list_of_games)}")
+
+    def game_moves_mean(self, list_of_games):
+        means = 0
+        for i in range(len(list_of_games)):
+            means += np.mean(len(list_of_games[i]) - 1)
+        return means/len(list_of_games)
 
     def setup_a_random_game(self):
         global dictionary_of_cards
@@ -912,7 +959,6 @@ class TestGameLogic(TestCase):
         waste_pile = []
         return tableu_piles, foundation_piles, waste_pile
 
-
     def get_random_card(self):
         # creating a list of cards that has not been taken.
         list_of_possible_cards = []
@@ -928,7 +974,6 @@ class TestGameLogic(TestCase):
             return card
         else:
             return None
-
 
     def insertVariables(self, testNumber=0):
         self.logicWasteCard = []
