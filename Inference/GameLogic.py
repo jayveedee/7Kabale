@@ -1,37 +1,3 @@
-def variable_check(card_number, unknowns):
-    card_number_string = str(card_number)
-    if card_number < 10:
-        card_number_string = "0" + card_number_string
-    if unknowns == -1:
-        scan = "NO"
-    elif unknowns == -2:
-        scan = "TOPCARD"
-    else:
-        scan = "YES"
-    return card_number_string, scan
-
-
-def check_how_many_cards_to_move(move_from_list, moved_card, tableau_pile_moved_from, tableau_pile_moved_to):
-    for i in range(len(tableau_pile_moved_from) - 1, -1, -1):
-        if tableau_pile_moved_from[i] == moved_card:
-            move_from_list = True
-        if move_from_list:
-            tableau_pile_moved_to.append(tableau_pile_moved_from[i])
-            tableau_pile_moved_from.pop(i)
-
-
-def check_card_type_matches(card_type, neighbor_card_type, n=0):
-    if n == 0:
-        if ((card_type == "d" or card_type == "h") and (neighbor_card_type == "c" or neighbor_card_type == "s")) or \
-                ((card_type == "c" or card_type == "s") and (neighbor_card_type == "d" or neighbor_card_type == "h")):
-            return True
-    if n == 1:
-        if ((card_type == "d" or card_type == "h") and (neighbor_card_type == "d" or neighbor_card_type == "h")) or \
-                ((card_type == "c" or card_type == "s") and (neighbor_card_type == "c" or neighbor_card_type == "s")):
-            return True
-    return False
-
-
 class GameLogic:
 
     def __init__(self, logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles):
@@ -166,7 +132,7 @@ class GameLogic:
                 sub_next_card_in_foundation = self.check_foundation_card_pile(sub_next_card_number,sub_next_card_type)
 
                 if not self.previous_move == "NA":
-                    if check_card_type_matches(sub_current_card_type, sub_next_card_type, 1):
+                    if self.check_card_type_matches(sub_current_card_type, sub_next_card_type, 1):
                         if sub_current_card_number == sub_next_card_number:
                             # If there are two cards of same type that can be moved to one place, pick the one with more unknowns
                             if self.unknownTableau[k] > self.unknownTableau[i]:
@@ -179,7 +145,7 @@ class GameLogic:
                         return "P5"
 
                     # Makes sure there is no other available move on tableau with the current card before placing it on the foundation
-                    if check_card_type_matches(sub_current_card_type,sub_next_card_type) and self.unknownTableau[k] != 0:
+                    if self.check_card_type_matches(sub_current_card_type,sub_next_card_type) and self.unknownTableau[k] != 0:
                         if sub_current_card_number - 1 == sub_next_card_number and self.check_foundation_card_pile:
                             return "P2"
 
@@ -295,7 +261,7 @@ class GameLogic:
         tableau_pile_moved_to = self.logicTableauCardPiles.get(card_pile_moved_to)
         if card_pile_moved_from != -1:
             tableau_pile_moved_from = self.logicTableauCardPiles.get(card_pile_moved_from)
-            check_how_many_cards_to_move(move_from_list, moved_card, tableau_pile_moved_from, tableau_pile_moved_to)
+            self.check_how_many_cards_to_move(move_from_list, moved_card, tableau_pile_moved_from, tableau_pile_moved_to)
         else:
             waste_card = self.check_how_many_waste_found()
             tableau_pile_moved_to.append(waste_card)
@@ -379,7 +345,7 @@ class GameLogic:
         return waste_card_number, waste_card_type
 
     def check_card_placement(self, i, card_number, card_type, j, neighbor_card_number, neighbor_card_type, is_sub_card, unknowns=0, move_type="", priority=0):
-        card_number_string, scan = variable_check(card_number, unknowns)
+        card_number_string, scan = self.variable_check(card_number, unknowns)
 
         if card_number <= 13 and priority == 0:
 
@@ -395,7 +361,7 @@ class GameLogic:
                 return True
 
             if neighbor_card_number > 0:
-                if check_card_type_matches(card_type, neighbor_card_type, 0):
+                if self.check_card_type_matches(card_type, neighbor_card_type, 0):
                     if neighbor_card_number - 1 == card_number:
                         self.create_move(card_number_string, card_type, i, j, "T", move_type, scan)
                         return True
@@ -464,4 +430,37 @@ class GameLogic:
 
     def get_piles(self):
         return self.logicTableauCardPiles, self.logicFoundationCardPiles, self.logicWasteCardPile
+
+    def variable_check(self, card_number, unknowns):
+        card_number_string = str(card_number)
+        if card_number < 10:
+            card_number_string = "0" + card_number_string
+        if unknowns == -1:
+            scan = "NO"
+        elif unknowns == -2:
+            scan = "TOPCARD"
+        else:
+            scan = "YES"
+        return card_number_string, scan
+
+    def check_how_many_cards_to_move(self, move_from_list, moved_card, tableau_pile_moved_from, tableau_pile_moved_to):
+        for i in range(len(tableau_pile_moved_from) - 1, -1, -1):
+            if tableau_pile_moved_from[i] == moved_card:
+                move_from_list = True
+            if move_from_list:
+                tableau_pile_moved_to.append(tableau_pile_moved_from[i])
+                tableau_pile_moved_from.pop(i)
+
+    def check_card_type_matches(self, card_type, neighbor_card_type, n=0):
+        if n == 0:
+            if ((card_type == "d" or card_type == "h") and (neighbor_card_type == "c" or neighbor_card_type == "s")) or \
+                    ((card_type == "c" or card_type == "s") and (
+                            neighbor_card_type == "d" or neighbor_card_type == "h")):
+                return True
+        if n == 1:
+            if ((card_type == "d" or card_type == "h") and (neighbor_card_type == "d" or neighbor_card_type == "h")) or \
+                    ((card_type == "c" or card_type == "s") and (
+                            neighbor_card_type == "c" or neighbor_card_type == "s")):
+                return True
+        return False
 

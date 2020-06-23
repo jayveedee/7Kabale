@@ -854,7 +854,7 @@ class TestGameLogic(TestCase):
         self.assertEqual(self.gl.check_foundation_card_pile(3, "c"), -1)
 
     def test_simulate_many_games(self):
-        number_of_games = 100
+        number_of_games = 100000
         number_of_wins = 0
 
         print(f"Simulating {number_of_games} solitaire games...")
