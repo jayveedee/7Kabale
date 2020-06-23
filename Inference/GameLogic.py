@@ -45,6 +45,7 @@ class GameLogic:
         self.unknownWasteCounter = 25
         self.reset = True
         self.result = []
+        self.previous_move = "NA"
         self.update_logic_scan(logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles)
 
     def update_logic_scan(self, logic_waste_card=None, logic_tableau_card_piles=None, logic_foundation_card_piles=None):
@@ -83,7 +84,7 @@ class GameLogic:
         return self.logicWasteCardPile, self.logicTableauCardPiles, self.logicFoundationCardPiles
 
     def update_logic_move(self, move):
-
+        self.previous_move = move[0]
         self.result = []
 
         if move[0] != "NA" and move[0] != "WIN" and move[0] != "LOSE":
@@ -109,13 +110,15 @@ class GameLogic:
 
         return ["NA", "NA", "NA", "NA", "NA"]
 
-    def calculate_move(self):
+    def calculate_move(self, reverse=False):
         if self.check_win_condition():
             return self.result
         elif self.check_lose_condition():
             return self.result
-
-        for i in range(len(self.logicTableauCardPiles)):
+        tableau_range = range(len(self.logicTableauCardPiles))
+        if reverse:
+            tableau_range = reversed(range(len(self.logicTableauCardPiles)))
+        for i in tableau_range:
             current_pile = self.logicTableauCardPiles.get(i)
 
             if len(current_pile) > 0:
@@ -152,22 +155,55 @@ class GameLogic:
         return self.check_waste_card_placement()
 
     def check_priority_one(self, current_pile, i):
-        if self.unknownTableau[i] == 0:
-            sub_current_card_number, sub_current_card_type, _ = self.define_card(i, len(current_pile) - 1, "T")
-            for k in range(len(self.logicTableauCardPiles)):
-                sub_next_pile = self.logicTableauCardPiles.get(k)
+        sub_current_card_number, sub_current_card_type, _ = self.define_card(i, len(current_pile) - 1, "T")
 
-                if len(sub_next_pile) != 0 and sub_next_pile != current_pile:
-                    sub_next_card_number, sub_next_card_type, _ = self.define_card(k, len(sub_next_pile) - 1, "T")
+        for k in range(len(self.logicTableauCardPiles)):
+            sub_current_card_in_foundation = self.check_foundation_card_pile(sub_current_card_number,sub_current_card_type)
+            sub_next_pile = self.logicTableauCardPiles.get(k)
 
+            if len(sub_next_pile) != 0 and sub_next_pile != current_pile:
+                sub_next_card_number, sub_next_card_type, _ = self.define_card(k, len(sub_next_pile) - 1, "T")
+                sub_next_card_in_foundation = self.check_foundation_card_pile(sub_next_card_number,sub_next_card_type)
+
+                if not self.previous_move == "NA":
                     if check_card_type_matches(sub_current_card_type, sub_next_card_type, 1):
-                        if sub_current_card_number == sub_next_card_number and self.unknownTableau[k] != 0:
-                            return "P1"
+                        if sub_current_card_number == sub_next_card_number:
+                            # If there are two cards of same type that can be moved to one place, pick the one with more unknowns
+                            if self.unknownTableau[k] > self.unknownTableau[i]:
+                                return "P1"
+                            # If both cards are the same, but one of them can be placed into the foundation, place that one first
+                            if sub_next_card_in_foundation != -1 and not sub_current_card_in_foundation == -1 and self.unknownTableau[k] > 0 and self.unknownTableau[i] > 0:
+                                return "P3"
 
-                    # TODO FIX CARDS BEING PUT ON FOUNDATION BEFORE CHECKING IF A CARD CAN BE PLACED ON THE CURRENT CARD TO REVEAL A UNKNOWN CARD
-                    # if self.check_priority_two()
-                    #     return "P2"
+                    if sub_next_card_in_foundation != -1 and self.unknownTableau[k] > 0:
+                        return "P5"
+
+                    # Makes sure there is no other available move on tableau with the current card before placing it on the foundation
+                    if check_card_type_matches(sub_current_card_type,sub_next_card_type) and self.unknownTableau[k] != 0:
+                        if sub_current_card_number - 1 == sub_next_card_number and self.check_foundation_card_pile:
+                            return "P2"
+
+                    # Only move a card away from an empty place if there is a king that can be placed on it
+                    if self.unknownTableau[i] == 0:
+                        if "13 s" not in self.logicWasteCardPile or "13 c" not in self.logicWasteCardPile or "13 h" not in self.logicWasteCardPile or "13 d" not in self.logicWasteCardPile:
+                            if self.unknownTableau[k] == 0 and sub_next_card_number == 13:
+                                return "P4"
+            else:
+                break
         return "NA"
+
+    def check_how_many_kings_on_tableau(self):
+        king_counter = 0
+        for i in range(len(self.logicTableauCardPiles)):
+            current_pile = self.logicTableauCardPiles.get(i)
+            if len(current_pile) != 0:
+                card_number, _, _ = self.define_card(i, len(current_pile) - 1, "T")
+                if card_number == 13:
+                    king_counter += 1
+        if king_counter == 4:
+            return True
+        else:
+            return False
 
     def check_tableau_placement(self, card_number, card_type, current_pile, i, j, next_card_number, next_card_type):
         unknowns = self.check_unknown_cards(i)
@@ -416,7 +452,7 @@ class GameLogic:
         return False
 
     def check_lose_condition(self):
-        if self.loseCounter > len(self.logicWasteCardPile) and self.unknownWaste == 0:
+        if self.loseCounter > len(self.logicWasteCardPile) + 1 and self.unknownWaste == 0:
             for i in range(7):
                 self.result.append("LOSE")
             return True
