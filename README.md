@@ -88,6 +88,7 @@ If no errors appear, the project will have been successfully implemented.
 
 1. Start DroidCam on your phone and PC
     1. Both the phone and PC must be on the same WiFi
+    1. The PC's device IP must match the phone's IP for it to be able to connect
 2. Run the Detector_Mod.py program
 3. Start detecting cards for every pile
     3. Choose a pile to add the card to by pressing "1 - 7" or the arrow keys on the keyboard
