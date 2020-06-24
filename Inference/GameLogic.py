@@ -179,7 +179,7 @@ class GameLogic:
 
                         # ONLY MOVE A CARD AWAY FROM A PLACE WITH NO UNKNOWNS IF THERE IS A KING THAT CAN BE PLACED THERE
                         if self.unknownTableau[i] == 0:
-                            if "13 s" not in self.logicWasteCardPile or "13 c" not in self.logicWasteCardPile or "13 h" not in self.logicWasteCardPile or "13 d" not in self.logicWasteCardPile:
+                            if ("13 s" not in self.logicWasteCardPile or "13 c" not in self.logicWasteCardPile or "13 h" not in self.logicWasteCardPile or "13 d" not in self.logicWasteCardPile) or self.check_how_many_kings_on_tableau():
                                 if self.unknownTableau[k] == 0 and sub_next_card_number == 13:
                                     return "P4"
                     else:
