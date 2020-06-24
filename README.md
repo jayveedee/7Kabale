@@ -1,14 +1,17 @@
 # 7-Kabal (Solitaire / Klondike)
 
-This program is used to play Top-Down solitaire game by using Computer Vision & Machine Learning
+7-kabal is used to play a game of Top-Down solitaire with the use of Computer Vision & Machine Learning
 
 ## Getting Started
 
-If you want to start playing a game og Klondike on your own PC, there are a couple of prerequisites that need to be installed and ready to use before you go any further. The instructions listed below should work with Windows, though with Linux and Mac tweaking may be required.
+If you want to run the project on your own PC, there are a couple of prerequisites that 
+are required before you go any further. 
+
+The instructions listed below should work with Windows, though with Linux and Mac some tweaking may be required.
 
 ### Prerequisites
 
-First of all, you need a CUDA compatible GPU and the drivers that are compatible with TensorFlow 1.15.2
+First of all, you need a CUDA compatible GPU, the CUDA driver & cuDNN library which is compatible with TensorFlow 1.15.2
 
 [Check CUDA compatibility](https://developer.nvidia.com/cuda-gpus)
 
@@ -16,7 +19,7 @@ First of all, you need a CUDA compatible GPU and the drivers that are compatible
 
 [Get cuDNN](https://developer.nvidia.com/rdp/cudnn-archive)
 
-Once you've got CUDA all setup, you also need to download 3 files that are used to run the inference, which are the weight files.
+Once you've got CUDA all setup, you also need to download 3 files that are used to run the inference & training.
 
 [Download trained_weights_final.h5](https://drive.google.com/file/d/1XWYXZuZDu36aqsacIaJ7t28o4202fuCC/view?usp=sharing)
 
@@ -24,31 +27,30 @@ Once you've got CUDA all setup, you also need to download 3 files that are used 
 
 [Download yolo3.weights](https://drive.google.com/file/d/1Lj3IMwXmizpZbCaerbJeOF2YXEmHXsgq/view?usp=sharing)
 
-Move trained_weights_final.h5 to the directory:
+From the main directory move trained_weights_final.h5 to the Model_Weights folder
 ```
 7-Kabal\Model_Weights
 ```
-Move yolo.h5 & yolo3.weights to the directory
+From the main directory move yolo.h5 & yolo3.weights to the keras_yolo3 folder
 ```
 7-Kabal\src\keras_yolo3
 ```
 
-Lastly, you need a virtual environment to install all the required packages in the next step. One of which is Anaconda.
+Lastly, you need a virtual environment to install all the required packages in the next step. One of which is Anaconda, that works well with this project.
 
 [Anaconda Python 3.7](https://www.anaconda.com/products/individual)
 
-To setup the environment recommended in this project, all you need to do is create a environment with the python version 3.7
-In the terminal:
+Afterwards create a environment with the python version 3.7 which is the recommended python version for this project. Using the 
+ terminal write:
 ```
 conda create -n 7-kabal python=3.7.0
 ```
 
 ### Installing
 
-After downloading and installing/setting up all the prerequisites, all that's left is to install all the required packages inside of the virutal environment.
+After setting up all the prerequisites, all that's left is to install the required packages inside of the virtual environment.
 
-
-Firstly get into the main directory of the project
+Firstly move into the main directory of the project
 
 ```
 cd C:\path\to\directory\7-Kabal
@@ -60,7 +62,7 @@ Install packages
 pip install -r requirements.txt
 ```
 
-To see if everything worked as it should, change directory to the inference folder
+To check if everything worked as intended, change directory to the inference folder
 
 ```
 cd Inference
@@ -72,7 +74,7 @@ Run the Detector_Mod.py program
 python Detector_Mod.py
 ```
 
-If everything works as it should, the terminal should be initializing tensorflow and all of the required classes without fail.
+If no errors appear, the project will have been successfully implemented.
 
 ## Authors
 
