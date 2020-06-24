@@ -9,7 +9,7 @@ import numpy as np
 
 class TestGameLogic(TestCase):
 
-    # TC00 - Test Case (Spil et spil færdigt)
+    # TC00 - Test Case (Spil et spil færdigt) VIRKER IKKE MERE FORDI OPDATERET PRIORITETER
     def test_play_game_one(self):
         tb = create_list(["06 h"], ["06 c"], ["13 d"], ["04 d"], ["03 h"], ["02 s"], ["08 c"])
         fd = {0: [], 1: [], 2: [], 3: []}
@@ -514,6 +514,7 @@ class TestGameLogic(TestCase):
         self.calculateMove(["WIN", "WIN", "WIN", "WIN", "WIN", "WIN", "WIN"],
                            ["NA", "NA", "NA", "NA", "NA"])
 
+    # TC00 - Test Case (Spil et spil færdigt) VIRKER IKKE MERE FORDI OPDATERET PRIORITETER
     def test_play_game_two(self):
         gl = create_empty_object()
         waste_card_pile_actual = []
@@ -729,8 +730,8 @@ class TestGameLogic(TestCase):
         self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["01 s"])
         self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["13 c"])
         self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["12 h", "13 c"])
-        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["07 d", "08 s"])
-        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["07 d", "08 s", "09 h"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["06 c", "07 d"])
+        self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["06 c", "07 d", "08 s"])
         self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["06 c", "07 d", "08 s", "09 h"])
         self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["01 h"])
         self.assertListEqual(gl.update_logic_move(gl.calculate_move()), ["02 s", "01 s"])
@@ -777,8 +778,8 @@ class TestGameLogic(TestCase):
 
         gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
 
-        list_of_actual_moves = [["04", "s", "0", "1", "T", "T", "NO"], ["01", "d", "2", "1", "F", "T", "YES"],
-                                ["02", "d", "3", "1", "F", "T", "YES"], ["10", "c", "4", "5", "T", "T", "YES"],
+        list_of_actual_moves = [["01", "d", "2", "1", "F", "T", "YES"], ["02", "d", "3", "1", "F", "T", "YES"],
+                                ["04", "s", "0", "1", "T", "T", "NO"], ["10", "c", "4", "5", "T", "T", "YES"],
                                 ["13", "h", "6", "0", "T", "T", "YES"], ["09", "d", "-1", "5", "T", "W", "YES"],
                                 ["03", "d", "-1", "1", "F", "W", "YES"], ["03", "c", "-1", "0", "F", "W", "YES"],
                                 ["12", "c", "-1", "0", "T", "W", "YES"], ["11", "h", "5", "0", "T", "T", "YES"],
@@ -845,6 +846,7 @@ class TestGameLogic(TestCase):
 
         self.assertListEqual(gl.calculate_move(), ["05", "c", "0", "2", "T", "T", "NO"])
 
+    # Tester tilføjelse af kort til fundamentet
     def test_check_foundation_card_pile(self):
         self.insertVariables(0)
 
@@ -853,8 +855,9 @@ class TestGameLogic(TestCase):
         self.assertEqual(self.gl.check_foundation_card_pile(6, "s"), -1)
         self.assertEqual(self.gl.check_foundation_card_pile(3, "c"), -1)
 
+    # TC04 - Test Case (Simulerer flere spil, printer win rate)
     def test_simulate_many_games(self):
-        number_of_games = 100000
+        number_of_games = 1000
         number_of_wins = 0
 
         print(f"Simulating {number_of_games} solitaire games...")
@@ -873,7 +876,7 @@ class TestGameLogic(TestCase):
 
             # keeping tack of moves in a game
             list_of_moves = []
-
+            extra_move = 0
             while game_is_running:
                 # play the game
                 if game_logic.unknownWaste == 0:
@@ -882,6 +885,12 @@ class TestGameLogic(TestCase):
                     game_logic.update_logic_scan(waste_card, tableau_piles, foundation_piles)
                 move = game_logic.calculate_move(True)
                 game_logic.update_logic_move(move)
+                if move[0] == "NA" and extra_move == 0:
+                    move = game_logic.calculate_move(True)
+                    game_logic.update_logic_move(move)
+                    extra_move += 1
+                elif extra_move > 0 and move[0] != "NA" and move[0] != "LOSE" and move[0] != "WIN":
+                    extra_move = 0
                 waste_card = None
 
                 tableau_piles = create_list([], [], [], [], [], [], [])
@@ -934,12 +943,14 @@ class TestGameLogic(TestCase):
         print(f"Win rate: {(number_of_wins / number_of_games) * 100}%")
         print(f"Average number of moves: {self.game_moves_mean(list_of_games)}")
 
+    # Win rate %
     def game_moves_mean(self, list_of_games):
         means = 0
         for i in range(len(list_of_games)):
             means += np.mean(len(list_of_games[i]) - 1)
         return means/len(list_of_games)
 
+    # Hjælpemetoder - instantier random spil
     def setup_a_random_game(self):
         global dictionary_of_cards
 
@@ -959,6 +970,7 @@ class TestGameLogic(TestCase):
         waste_pile = []
         return tableu_piles, foundation_piles, waste_pile
 
+    # Hjælpemetoder - hent et random kort
     def get_random_card(self):
         # creating a list of cards that has not been taken.
         list_of_possible_cards = []
@@ -975,58 +987,7 @@ class TestGameLogic(TestCase):
         else:
             return None
 
-    def insertVariables(self, testNumber=0):
-        self.logicWasteCard = []
-        self.logicWasteCard.append("01 d")
-
-        list0 = []
-        list00 = []
-        list000 = []
-        list0000 = []
-
-        if testNumber == 0:
-            list000.append("02 h")
-            list000.append("01 h")
-
-        list1 = []
-        list11 = []
-        list111 = []
-        list1111 = []
-        list11111 = []
-        list111111 = []
-        list1111111 = []
-
-        if testNumber == 0:
-            list1.append("06 c")
-            list1.append("07 d")
-            list1.append("08 s")
-            list11.append("11 s")
-            list111.append("04 s")
-            list111.append("05 h")
-            list1111.append("13 c")
-            list11111.append("01 s")
-            list111111.append("13 s")
-            list111111.append("12 unknown")
-            list1111111.append("03 h")
-        if testNumber == 1:
-            list1.append("06 c")
-            list11.append("11 s")
-            list111.append("04 s")
-            list1111.append("13 c")
-            list11111.append("01 s")
-            list111111.append("13 s")
-            list1111111.append("03 h")
-
-        if testNumber == 2:
-            list1.append("13 h")
-            list111.append("13 s")
-
-        self.logicTableauCardPiles = {0: list1, 1: list11, 2: list111, 3: list1111, 4: list11111, 5: list111111,
-                                      6: list1111111}
-        self.logicFoundationCardPiles = {0: list0, 1: list00, 2: list000, 3: list0000}
-
-        self.gl = GameLogic.GameLogic(self.logicWasteCard, self.logicTableauCardPiles, self.logicFoundationCardPiles)
-
+    # Hjælpemetoder - tjekker om calculate move og update move bliver til de rigtige ting
     def calculateMove(self, trueMove, trueResult):
         move = self.gl.calculate_move()
         # Calculates the move
@@ -1034,6 +995,7 @@ class TestGameLogic(TestCase):
         # Updates the logic with regards to the move made
         self.assertListEqual(self.gl.update_logic_move(move), trueResult)
 
+    # Hjælpemetoder - opdaterer en specifik dictionary liste's element
     def updateLists(self, whereTo, card, index):
         if whereTo == "T":
             taaa = (copy.deepcopy(self.gl.logicTableauCardPiles))
@@ -1068,7 +1030,7 @@ class TestGameLogic(TestCase):
             waa, _, _ = self.gl.update_logic_scan(wa, None, None)
             self.assertListEqual(waa, waaa)
 
-
+# Hjælpemetoder - laver dictionaries
 def create_list(li0, li1, li2, li3, li4=None, li5=None, li6=None):
     if li4 is not None:
         dict_lists = {0: li0, 1: li1, 2: li2, 3: li3, 4: li4, 5: li5, 6: li6}
@@ -1076,7 +1038,7 @@ def create_list(li0, li1, li2, li3, li4=None, li5=None, li6=None):
         dict_lists = {0: li0, 1: li1, 2: li2, 3: li3}
     return dict_lists
 
-
+# Hjælpemetoder - laver et tomt gamelogic object
 def create_empty_object():
     list0 = [];
     list00 = [];
@@ -1093,7 +1055,7 @@ def create_empty_object():
     tableau_piles = {0: list1, 1: list11, 2: list111, 3: list1111, 4: list11111, 5: list111111, 6: list1111111}
     return GameLogic.GameLogic(None, tableau_piles, foundation_piles)
 
-
+# hjælpe variabler - en dictionary af alle kort
 dictionary_of_cards = {
     "08 c": False,
     "13 s": False,

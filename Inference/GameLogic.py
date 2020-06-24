@@ -1,147 +1,185 @@
 class GameLogic:
 
+    # OBJECT CONSTRUCTOR AND ALL ITS VARIABLES
     def __init__(self, logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles):
         self.logicWasteCardPile = []
         self.logicTableauCardPiles = {}
         self.logicFoundationCardPiles = {}
-        self.unknownWaste = 0
-        self.loseCounter = 0
-        self.unknownTableau = []
-        self.allUnknownWasteFound = False
-        self.unknownWasteCounter = 25
-        self.reset = True
         self.result = []
-        self.previous_move = "NA"
+        self.previous_move = ""
+        self.unknownTableau = []
+        self.unknownWaste = 24
+        self.unknownWasteCounter = 100
+        self.loseCounter = 0
+        self.allUnknownWasteFound = False
+        self.reset = True
         self.update_logic_scan(logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles)
 
-    def update_logic_scan(self, logic_waste_card=None, logic_tableau_card_piles=None, logic_foundation_card_piles=None):
-        if (self.logicTableauCardPiles is None and self.logicFoundationCardPiles is None and self.logicWasteCardPile is None) or (self.reset is True):
-            if logic_waste_card is not None:
-                self.logicWasteCardPile = logic_waste_card
-            if logic_tableau_card_piles is not None:
-                self.logicTableauCardPiles = logic_tableau_card_piles
-            else: self.logicTableauCardPiles = {0:[],1:[],2:[],3:[],4:[],5:[],6:[]}
-            if logic_foundation_card_piles is not None:
-                self.logicFoundationCardPiles = logic_foundation_card_piles
-            else: self.logicFoundationCardPiles = {0:[],1:[],2:[],3:[]}
-            self.unknownWaste = 24
-            self.unknownTableau.clear()
-            for i in range(7):
-                counter = 0
-                for j in range(i):
-                    counter += 1
-                self.unknownTableau.append(counter)
-            self.reset = False
+    # RESETS THE CONSTRUCTOR VARIABLES TO THEIR INITIAL STATE
+    def reset_variables(self):
+        self.logicWasteCardPile = []
+        self.logicTableauCardPiles = {}
+        self.logicFoundationCardPiles = {}
+        self.result = []
+        self.previous_move = ""
+        self.unknownTableau = []
+        self.unknownWaste = 24
+        self.unknownWasteCounter = 100
+        self.loseCounter = 0
+        self.allUnknownWasteFound = False
+        self.unknownTableau.clear()
+        for i in range(7):
+            counter = 0
+            for j in range(i):
+                counter += 1
+            self.unknownTableau.append(counter)
 
+    # ADDS THE FIRST SCANNED LISTS/VARIABLES TO THE OBJECT, THE FIRST TIME IT'S CREATED
+    def insert_first_time_scan(self, wa, tb, fa):
+        if wa is not None:
+            self.logicWasteCardPile = wa
+        if tb is not None:
+            self.logicTableauCardPiles = tb
         else:
+            self.logicTableauCardPiles = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
+        if fa is not None:
+            self.logicFoundationCardPiles = fa
+        else:
+            self.logicFoundationCardPiles = {0: [], 1: [], 2: [], 3: []}
+        self.reset = False
+
+    # A MAIN METHOD THAT'S USED FOR INSERTING NEWLY DETECTED CARDS INTO THE INSTANTIATED VARIABLES
+    def update_logic_scan(self, logic_waste_card=None, logic_tableau_card_piles=None, logic_foundation_card_piles=None):
+        # IF FIRST TIME RUNNING
+        if (self.logicTableauCardPiles is None and self.logicFoundationCardPiles is None and self.logicWasteCardPile is None) or (self.reset is True):
+            self.reset_variables()
+            self.insert_first_time_scan(logic_waste_card, logic_tableau_card_piles, logic_foundation_card_piles)
+        # ELSE ALL OTHER TIMES RUNNING
+        else:
+            # CHECKS IF WASTE CARD
             if logic_waste_card is not None:
                 if logic_waste_card not in self.logicWasteCardPile:
                     self.unknownWaste -= 1
                     if self.unknownWaste == 0:
                         self.allUnknownWasteFound = True
                     self.logicWasteCardPile.append(logic_waste_card)
-
+            # CHECKS IF TABLEAU LIST
             if logic_tableau_card_piles is not None:
                 self.check_list_consistency(logic_tableau_card_piles, self.logicTableauCardPiles)
-
+            # CHECKS IF FOUNDATION LIST
             if logic_foundation_card_piles is not None:
                 self.check_list_consistency(logic_foundation_card_piles, self.logicFoundationCardPiles)
-
+        # RETURNS THE UPDATED INSTANTIATED VARIABLES
         return self.logicWasteCardPile, self.logicTableauCardPiles, self.logicFoundationCardPiles
 
+    # A MAIN METHOD THAT'S USED FOR UPDATING THE INSTANTIATED VARIABLES DEPENDING ON WHAT MOVE WAS JUST MADE
     def update_logic_move(self, move):
+        # ADDS A PREVIOUS MOVE AND RESETS THE LAST MOVE
         self.previous_move = move[0]
         self.result = []
-
+        # IF THERE IS A MOVE AND THE GAME HAS NOT FINISHED YET
         if move[0] != "NA" and move[0] != "WIN" and move[0] != "LOSE":
-
+            # DEFINE A VARIABLE TO CHECK FOR MULTIPLE CARDS TO MOVE FROM ONE PILE TO ANOTHER
             move_from_list = False
-
+            # DEFINE THE MOVE INTO LOCAL VARIABLES
             moved_card = move[0] + " " + move[1]
             card_pile_moved_from = int(move[2])
             card_pile_moved_to = int(move[3])
             card_placement = move[4]
             move_type = move[5]
             scan = move[6]
-
+            # IF THERE WAS A UNKNOWN CARD IN THE CURRENT MOVE, UPDATE THE LIST OF UNKNOWN CARDS
             if scan == "YES" and move_type == "T":
                 self.unknownTableau[card_pile_moved_from] -= 1
-
+            # IF IT WAS A MOVE TO BE PLACED ON THE TABLEAU
             if card_placement == "T":
                 return self.handle_update_tableau_and_moved_pile(card_pile_moved_from, card_pile_moved_to, move_from_list, moved_card)
+            # IF IT WAS A MOVE TO BE PLACED ON THE FOUNDATION
             if card_placement == "F":
                 return self.handle_update_foundation_and_moved_pile(card_pile_moved_from, card_pile_moved_to, moved_card)
-
+        # THERE WAS NO MOVE, CHECK IF WE CAN ACCESS THE REVERSE WASTE PILE FUNCTION
         self.handle_update_reversed_waste_pile()
-
+        # THERE WAS NO MOVE TO UPDATE WITH, RETURN NA TO INDICATE NOTHING WAS UPDATED
         return ["NA", "NA", "NA", "NA", "NA"]
 
+    # A MAIN METHOD THAT HANDLES THE GAME'S ALGORITHM FOR FINDING VALID MOVES
     def calculate_move(self, reverse=False):
-        if self.check_win_condition():
+        # CHECKS IF GAME HAS ENDED
+        if self.check_win_condition() or self.check_lose_condition():
             return self.result
-        elif self.check_lose_condition():
-            return self.result
+        # VARIABLE THAT DEFINES IF THE FOR-LOOP SHOULD BE REVERSED OR NOT (RIGHT-LEFT OR LEFT-RIGHT)
         tableau_range = range(len(self.logicTableauCardPiles))
         if reverse:
             tableau_range = reversed(range(len(self.logicTableauCardPiles)))
+        # THE FOR LOOP THAT ITERATES THROUGH THE TABLEAU PILES
         for i in tableau_range:
+            # CURRENT PILE BEING LOOKED AD
             current_pile = self.logicTableauCardPiles.get(i)
-
+            # CHECKS IF THE PILE IS EMPTY
             if len(current_pile) > 0:
-
+                # DEFINE THE CURRENT PILE'S TOP CARD NUMBER AND TYPE VARIABLES
                 card_number, card_type, _ = self.define_card(i, 0, "T")
-
+                # THE NEXT FOR LOOP THAT ITERATES ALL THE NEIGHBOURS OF THE CURRENT PILE
                 for j in range(len(self.logicTableauCardPiles)):
+                    # DEFINES THE NEIGHBOUR PILE CURRENTLY BEING LOOKED AT
                     neighbor_pile = self.logicTableauCardPiles.get(j)
-
+                    # IF THERE IS AN EMPTY PILE, CHECKS IF A KING CAN BE PLACED OR IF THE CURRENT CARD CAN BE PLACED ON THE FOUNDATION
                     empty_space = self.check_empty_spaces(card_number, card_type, current_pile, i, j, neighbor_pile)
                     if empty_space is "King" or empty_space is "Foundation":
                         return self.result
+                    # IF THE PILE IS NOT EMPTY
                     elif empty_space is False:
+                        # AND IF THE CURRENT PILE IS NOT THE SAME AS THE NEIGHBOUR PILE
                         if current_pile[0] != neighbor_pile[0]:
-
+                            # DEFINE THE NEIGHBOUR TOP CARD CARD AND TYPE VARIABLES
                             next_card_number, next_card_type, _ = self.define_card(j, 0, "T")
-
-                            if current_pile[0] is not None:
-                                for k in range(len(current_pile) - 1, 0, -1):
-
-                                    sub_card_number, sub_card_type, _ = self.define_card(i, k, "T")
-
-                                    if self.check_sub_pile_placement(current_pile, i, j, k, next_card_number, next_card_type, sub_card_number, sub_card_type):
-                                        return self.result
-
+                            # THE THIRD AND FINAL FOR LOOP THAT ITERATES THROUGH ALL SUB CARDS IN THE CURRENT PILE
+                            for k in range(len(current_pile) - 1, 0, -1):
+                                # DEFINES SUB CARD AND TYPE VARIABLES
+                                sub_card_number, sub_card_type, _ = self.define_card(i, k, "T")
+                                # CHECKS IF A SUB CARD CAN BE PLACED ON ANOTHER PILE
+                                if self.check_sub_pile_placement(current_pile, i, j, k, next_card_number, next_card_type, sub_card_number, sub_card_type):
+                                    return self.result
+                            # A PRIORITY CHECKLIST, THAT FOCUSES ON MAKING ONLY THE BEST MOVES POSSIBLE FIRST FOR THE CURREMT CARD
                             priority = self.check_priority_one(current_pile, i)
-
+                            # IF THERE WAS NO PRIORITY FOUND, WE DO IT THE GOOD OLD FASHIONED WAY! JUST MOVING THE CARD OVER
                             if priority == "NA":
                                 if self.check_tableau_placement(card_number, card_type, current_pile, i, j, next_card_number, next_card_type):
                                     return self.result
+                            # IF A PRIORITY FOUND, THAT MEANS WE NEED TO MOVE ANOTHER CARD FIRST, SO WE BREAK OUT OF THIS LOOP
                             else:
                                 break
-
+        # CHECKS IF A WASTE CARD CAN BE PLACED
         return self.check_waste_card_placement()
 
+    # MOST OF THE IMPLEMENTED PRIORITIES
     def check_priority_one(self, current_pile, i):
+        # DEFINE THE INNERMOST CURRENT SUB CARD & CHECKS IF THE CURRENT SUB CARD CAN BE PLACED ON THE FOUNDATION
         sub_current_card_number, sub_current_card_type, _ = self.define_card(i, len(current_pile) - 1, "T")
-
+        sub_current_card_in_foundation = self.check_foundation_card_pile(sub_current_card_number, sub_current_card_type)
+        # A FOR LOOP THAT ITERATES THROUGH THE WHOLE TABLEAU PILES AGAIN
         for k in range(len(self.logicTableauCardPiles)):
-            sub_current_card_in_foundation = self.check_foundation_card_pile(sub_current_card_number,sub_current_card_type)
+            # DEFINES THE NEIGHBOUR PILE
             sub_next_pile = self.logicTableauCardPiles.get(k)
-
+            # IF THE TWO PILES AREN'T THE SAME AND THE NEXT PILE ISN'T EMPTY
             if len(sub_next_pile) != 0 and sub_next_pile != current_pile:
+                # DEFINES THE INNERMOST SUB CARD AND TYPE & CHECKS IF IT CAN BE PLACED ONTO THE FOUNDATION
                 sub_next_card_number, sub_next_card_type, _ = self.define_card(k, len(sub_next_pile) - 1, "T")
                 sub_next_card_in_foundation = self.check_foundation_card_pile(sub_next_card_number,sub_next_card_type)
-
-                if not self.previous_move == "NA":
+                # IF THE PREVIOUS MOVE WASN'T A VALID MOVE, WE DON'T ENTER HERE
+                if self.previous_move != "NA":
+                    # CHECKS IF THE TWO DIFFERENT CARDS HAVE THE SAME DIFFERING TYPE (WHICH MEANS THEY CAN NOT BE PLACED ON ONE ANOTHER)
                     if self.check_card_type_matches(sub_current_card_type, sub_next_card_type, 1):
+                        # IF THE TWO CARDS ARE THE SAME NUMBER AS WELL
                         if sub_current_card_number == sub_next_card_number:
-                            # If there are two cards of same type that can be moved to one place, pick the one with more unknowns
+                            # IF THERE ARE TWP CARDS OF THE SAME TYPE THAT CAN BE MOVED TO ONE PLACE, PICK THE ONE WITH MOST UNKNOWNS
                             if self.unknownTableau[k] > self.unknownTableau[i]:
                                 return "P1"
-                            # If both cards are the same, but one of them can be placed into the foundation, place that one first
+                            # IF BOTH ARE THE SAME KIND OF CARD, BUT ONE OF THEM CAN ONTO THE FOUNDATION, PLACE THAT ONE FIRST
                             if sub_next_card_in_foundation != -1 and not sub_current_card_in_foundation == -1 and self.unknownTableau[k] > 0 and self.unknownTableau[i] > 0:
                                 return "P3"
-
-                    if sub_next_card_in_foundation != -1 and self.unknownTableau[k] > 0:
+                    # IF THE NEIGHBOUR CARD CAN BE PLACED ON THE FOUNDATION AND HAS UNKNOWNS UNDER IT
+                    if len(sub_next_pile) sub_next_card_in_foundation != -1 and self.unknownTableau[k] > 0:
                         return "P5"
 
                     # Makes sure there is no other available move on tableau with the current card before placing it on the foundation
@@ -154,8 +192,8 @@ class GameLogic:
                         if "13 s" not in self.logicWasteCardPile or "13 c" not in self.logicWasteCardPile or "13 h" not in self.logicWasteCardPile or "13 d" not in self.logicWasteCardPile:
                             if self.unknownTableau[k] == 0 and sub_next_card_number == 13:
                                 return "P4"
-            else:
-                break
+                else:
+                    break
         return "NA"
 
     def check_how_many_kings_on_tableau(self):
