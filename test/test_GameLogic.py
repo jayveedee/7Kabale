@@ -867,7 +867,7 @@ class TestGameLogic(TestCase):
 
     # TC04 - Test Case (Simulerer flere spil, printer win rate)
     def test_simulate_many_games(self): # Asama Hayder & Jákup Viljam Dam
-        number_of_games = 100
+        number_of_games = 2000
         number_of_wins = 0
 
         print(f"Simulating {number_of_games} solitaire games...")
