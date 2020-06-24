@@ -40,6 +40,10 @@ From the main directory move yolo.h5 & yolo3.weights to the keras_yolo3 folder
 7-Kabal\src\keras_yolo3
 ```
 
+To detect cards, you need a webcam, but in this project DroidCam was implemented instead, so that a phone could be used as a substitute webcam. To be able to use DroidCam, download the client on your PC and app on your phone.
+
+[DroidCam](https://www.dev47apps.com/)
+
 Lastly, you need a virtual environment to install all the required packages in the next step. One of which is Anaconda, that works well with this project.
 
 [Anaconda Python 3.7](https://www.anaconda.com/products/individual)
@@ -79,6 +83,20 @@ python Detector_Mod.py
 ```
 
 If no errors appear, the project will have been successfully implemented.
+
+## Running the application
+
+1. Start DroidCam on your phone and PC
+    1. Both the phone and PC must be on the same WiFi
+2. Run the Detector_Mod.py program
+3. Start detecting cards for every pile
+    3. Choose a pile to add the card to by pressing "1 - 7" or the arrow keys on the keyboard
+    3. If a mistake was made, clear the pile by pressing "c"
+    3. When done scanning press "e"
+4. When all piles have been scanned, the game begins.
+    4. Scan the waste pile when needed
+    4. Try to follow the moves being indicated on the GUI
+5. Have fun!
 
 ## Authors
 
