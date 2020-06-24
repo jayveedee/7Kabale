@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://i.imgur.com/0J3QMlC.png">
+</p>
+
 # 7-Kabal (Solitaire / Klondike)
 
 7-kabal is used to play a game of Top-Down solitaire with the use of Computer Vision & Machine Learning
