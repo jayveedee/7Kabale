@@ -179,7 +179,7 @@ class GameLogic:
                             if sub_next_card_in_foundation != -1 and not sub_current_card_in_foundation == -1 and self.unknownTableau[k] > 0 and self.unknownTableau[i] > 0:
                                 return "P3"
                     # IF THE NEIGHBOUR CARD CAN BE PLACED ON THE FOUNDATION AND HAS UNKNOWNS UNDER IT
-                    if len(sub_next_pile) sub_next_card_in_foundation != -1 and self.unknownTableau[k] > 0:
+                    if sub_next_card_in_foundation != -1 and self.unknownTableau[k] > 0:
                         return "P5"
 
                     # Makes sure there is no other available move on tableau with the current card before placing it on the foundation
