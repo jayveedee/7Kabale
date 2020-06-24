@@ -137,7 +137,7 @@ def show_detected_cards(some_image, font, text_size, text_thickness, border_colo
     if 6 < current_pile < 11:
         some_range = range(6)
         pile = foundation_piles.get(current_pile-7)
-    elif current_pile < 7:
+    elif -1 < current_pile < 7:
         some_range = range(6)
         pile = tableu_piles.get(current_pile)
     else:
@@ -186,8 +186,8 @@ def show_text(some_image, move):
         cv2.putText(some_image, "'c' to clear pile", (0, 70), font, text_size, text_border_color, border_thickness)
         cv2.putText(some_image, "'c' to clear pile", (0, 70), font, text_size, text_color, text_thickness)
 
-        cv2.putText(some_image, "'SPACE' for next pile", (0, 110), font, text_size, text_border_color, border_thickness)
-        cv2.putText(some_image, "'SPACE' for next pile", (0, 110), font, text_size, text_color, text_thickness)
+        cv2.putText(some_image, "'SPACE' or '0..7' to change pile", (0, 110), font, text_size, text_border_color, border_thickness)
+        cv2.putText(some_image, "'SPACE' or '0..7' to change pile", (0, 110), font, text_size, text_color, text_thickness)
 
         cv2.putText(some_image, "'e' for done scanning", (0, 150), font, text_size, text_border_color, border_thickness)
         cv2.putText(some_image, "'e' for done scanning", (0, 150), font, text_size, text_color, text_thickness)
@@ -259,14 +259,30 @@ def show_move(move, some_image, font, text_size, text_thickness, border_color, b
     return
 
 
-def change_pile():
+def change_pile(some_k):
     global current_pile
     total_number_of_piles = len(dictionary_of_pile_names)
     max_pile_index = total_number_of_piles - 1
-    if current_pile == max_pile_index:
-        current_pile = 0
+
+    if some_k != 32:
+        switch = {
+            48: 12,
+            49: 1,
+            50: 2,
+            51: 3,
+            52: 4,
+            53: 5,
+            54: 6,
+            55: 7
+        }
+
+        current_pile = switch.get(some_k)-1
     else:
-        current_pile += 1
+        if current_pile == max_pile_index:
+            current_pile = 0
+        else:
+            current_pile += 1
+
     return
 
 
@@ -309,6 +325,7 @@ def done_scanning():
     global game_has_just_started
     global game_logic
     global list_of_piles
+    global extra_move
 
     # print(game_logic.unknownWaste)
     #if game_logic.unknownWaste == 0:
@@ -363,9 +380,10 @@ def done_scanning():
         #for pile in range(12):
         #    list_of_piles_only_containing_newly_detected_cards[pile].clear()
 
-    move = game_logic.calculate_move()
+    move = game_logic.calculate_move(True)
     print(move)
     game_logic.update_logic_move(move)
+    if move[0]
     """list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards = game_logic.get_piles()
 
     print("Getting the following piles from logic:")
@@ -491,10 +509,10 @@ tableu_piles = {}
 foundation_piles = {}
 waste_pile = []
 game_logic = GameLogic.GameLogic(None, None, None)
+extra_move = 0
 # there_are_unknown_cards = False
 
 while not game_has_ended:
-
     if some_move is not None:
         if some_move[0] == "NA":
             is_confirming_move = False
@@ -558,8 +576,8 @@ while not game_has_ended:
         break
     if k == 99 and not is_confirming_move:  # When 'c' is pressed we clear current pile
         clear_current_pile()
-    if k == 32 and not is_confirming_move:  # When 'SPACE' is pressed we change pile
-        change_pile()
+    if (k == 32 or (47 < k < 56)) and not is_confirming_move:  # When 'SPACE' or '0..7' is pressed we change pile
+        change_pile(k)
     if k == 101:  # When 'e' is pressed, we stop scanning or confirm move
         print("Just pressed e")
         if not is_confirming_move:
