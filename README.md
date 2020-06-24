@@ -9,13 +9,19 @@ If you want to start playing a game og Klondike on your own PC, there are a coup
 ### Prerequisites
 
 First of all, you need a CUDA compatible GPU and the drivers that are compatible with TensorFlow 1.15.2
+
 [Check CUDA compatibility](https://developer.nvidia.com/cuda-gpus)
+
 [Get CUDA driver](https://developer.nvidia.com/cuda-toolkit-archive)
+
 [Get cuDNN](https://developer.nvidia.com/rdp/cudnn-archive)
 
 Once you've got CUDA all setup, you also need to download 3 files that are used to run the inference, which are the weight files.
+
 [Download trained_weights_final.h5](https://drive.google.com/file/d/1XWYXZuZDu36aqsacIaJ7t28o4202fuCC/view?usp=sharing)
+
 [Download yolo.h5](https://drive.google.com/file/d/13kQJDb11mOii8x5oPDFkPxJ2-mp75UpV/view?usp=sharing)
+
 [Download yolo3.weights](https://drive.google.com/file/d/1Lj3IMwXmizpZbCaerbJeOF2YXEmHXsgq/view?usp=sharing)
 
 Move trained_weights_final.h5 to the directory:
@@ -27,7 +33,8 @@ Move yolo.h5 & yolo3.weights to the directory
 7-Kabal\src\keras_yolo3
 ```
 
-Lastly, you need a virtual environment to install all the required packages in the next step.
+Lastly, you need a virtual environment to install all the required packages in the next step. One of which is Anaconda.
+
 [Anaconda Python 3.7](https://www.anaconda.com/products/individual)
 
 To setup the environment recommended in this project, all you need to do is create a environment with the python version 3.7
