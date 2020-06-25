@@ -57,28 +57,21 @@ And inside of the path variable is where you finally define which path to specif
   <img src="https://i.imgur.com/Pqd4wqE.png">
 </p>
 
-Once you've got CUDA all setup, you also need to download 3 files that are used to run the inference & training.
-
+Once you've got CUDA all setup, you need to download our trained model because it is too big (240MB) to be in our github repository.
 [Download trained_weights_final.h5](https://drive.google.com/file/d/1XWYXZuZDu36aqsacIaJ7t28o4202fuCC/view?usp=sharing)
-
-[Download yolo.h5](https://drive.google.com/file/d/13kQJDb11mOii8x5oPDFkPxJ2-mp75UpV/view?usp=sharing)
-
-[Download yolo3.weights](https://drive.google.com/file/d/1Lj3IMwXmizpZbCaerbJeOF2YXEmHXsgq/view?usp=sharing)
 
 From the main directory move trained_weights_final.h5 to the Model_Weights folder
 ```
 7-Kabale\Model_Weights
 ```
-From the main directory move yolo.h5 & yolo3.weights to the keras_yolo3 folder
-```
-7-Kabale\src\keras_yolo3
-```
 
-To detect cards, you need a webcam, but in this project DroidCam was implemented instead, so that a phone could be used as a substitute webcam. To be able to use DroidCam, download the client on your PC and app on your phone.
+To detect cards, you need a webcam.
+However, it is also possible to use a phone as a webcam, by installing Droidcam on your phone and Droidcam client on your pc.
+Make sure both the phone and pc are on the same network, and connect the two by writing the info on the phone inside the client.
 
 [DroidCam](https://www.dev47apps.com/)
 
-Lastly, you need a virtual environment to install all the required packages in the next step. One of which is Anaconda, that works well with this project.
+Lastly, we recommend a virtual environment to install all the required packages in the next step. One of which is Anaconda, that works well with this project.
 
 [Anaconda Python 3.7](https://www.anaconda.com/products/individual)
 
