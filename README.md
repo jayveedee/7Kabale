@@ -47,14 +47,14 @@ system environment variables
 Afterwards pressing the lower right button called "Environment Variables" and choosing the "path" variable under "User variables" and clicking edit
 
 <p align="center">
-  <img width="350px" src="https://i.imgur.com/49CUQDh.png">
-  <img width="420px" src="https://i.imgur.com/qPa3Om7.png">
+  <img width="350px" src="https://i.imgur.com/EwKkgBA.png">
+  <img width="424px" src="https://i.imgur.com/jrgyJIx.png">
 </p>
 
 And inside of the path variable is where you finally define which path to specify to the CUDA directory, where you add new paths simply by clicking on new and pasting in the the path. Below you can see how it should be done if you have downloaded CUDA v10.0
 
 <p align="center">
-  <img src="https://i.imgur.com/JJMWwfQ.png">
+  <img src="https://i.imgur.com/Pqd4wqE.png">
 </p>
 
 Once you've got CUDA all setup, you also need to download 3 files that are used to run the inference & training.
