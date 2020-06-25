@@ -17,7 +17,9 @@ The instructions listed below should work with Windows, though with Linux and Ma
 
 First of all, you need a CUDA compatible GPU, the CUDA driver & cuDNN library which is compatible with TensorFlow 1.15.2
 
-[Check CUDA compatibility](https://developer.nvidia.com/cuda-gpus)
+[Check CUDA/GPU compatibility](https://developer.nvidia.com/cuda-gpus)
+
+[Check CUDA/TensorFlow compatibility](https://www.tensorflow.org/install/source_windows#tested_build_configurations)
 
 [Get CUDA driver](https://developer.nvidia.com/cuda-toolkit-archive)
 
