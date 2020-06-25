@@ -2,9 +2,9 @@
   <img src="https://i.imgur.com/0J3QMlC.png">
 </p>
 
-# 7-Kabal (Solitaire / Klondike)
+# 7-Kabale (Solitaire / Klondike)
 
-7-kabal is used to play a game of Top-Down solitaire with the use of Computer Vision & Machine Learning
+7-kabale is used to play a game of Top-Down solitaire with the use of Computer Vision & Machine Learning
 
 ## Getting Started
 
@@ -21,7 +21,41 @@ First of all, you need a CUDA compatible GPU, the CUDA driver & cuDNN library wh
 
 [Get CUDA driver](https://developer.nvidia.com/cuda-toolkit-archive)
 
-[Get cuDNN](https://developer.nvidia.com/rdp/cudnn-archive)
+[Get cuDNN](https://developer.nvidia.com/cudnn)
+
+After installing the CUDA driver and downloaded the cuDNN library, navigate to the "NVIDIA GPU Computing Toolkit" directory usually located here
+
+```
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0
+```
+
+And then move the following 4 files downloaded from the cuDNN library into the directory above
+
+```
+bin
+include
+lib
+NVIDIA_SLA_cuDNN_Support.txt
+```
+
+Finally, all that's left is to add CUDA's PATH to environment variables. On Windows 10, type into the Windows search bar
+
+```
+system environment variables
+```
+
+Afterwards pressing the lower right button called "Environment Variables" and choosing the "path" variable under "User variables" and clicking edit
+
+<p align="center">
+  <img width="350px" src="https://i.imgur.com/EwKkgBA.png">
+  <img width="424px" src="https://i.imgur.com/jrgyJIx.png">
+</p>
+
+And inside of the path variable is where you finally define which path to specify to the CUDA directory, where you add new paths simply by clicking on new and pasting in the the path. Below you can see how it should be done if you have downloaded CUDA v10.0
+
+<p align="center">
+  <img src="https://i.imgur.com/Pqd4wqE.png">
+</p>
 
 Once you've got CUDA all setup, you also need to download 3 files that are used to run the inference & training.
 
@@ -33,11 +67,11 @@ Once you've got CUDA all setup, you also need to download 3 files that are used 
 
 From the main directory move trained_weights_final.h5 to the Model_Weights folder
 ```
-7-Kabal\Model_Weights
+7-Kabale\Model_Weights
 ```
 From the main directory move yolo.h5 & yolo3.weights to the keras_yolo3 folder
 ```
-7-Kabal\src\keras_yolo3
+7-Kabale\src\keras_yolo3
 ```
 
 To detect cards, you need a webcam, but in this project DroidCam was implemented instead, so that a phone could be used as a substitute webcam. To be able to use DroidCam, download the client on your PC and app on your phone.
@@ -61,10 +95,16 @@ After setting up all the prerequisites, all that's left is to install the requir
 Firstly move into the main directory of the project
 
 ```
-cd C:\path\to\directory\7-Kabal
+cd C:\path\to\directory\7-Kabale
 ```
 
-Install packages
+Open the environment you've created, if you used Anaconda do the following in the terminal
+
+```
+conda activate 7-kabale
+```
+
+Install the packages
 
 ```
 pip install -r requirements.txt
@@ -86,7 +126,7 @@ If no errors appear, the project will have been successfully implemented.
 
 ## Running the application
 
-1. Start DroidCam on your phone and PC
+1. Start DroidCam on your phone and PC or use your own webcam and skip the two next steps
     1. Both the phone and PC must be on the same WiFi
     1. The PC's device IP must match the phone's IP for it to be able to connect
 2. Run the Detector_Mod.py program
@@ -111,3 +151,4 @@ If no errors appear, the project will have been successfully implemented.
 
 * [qqwwee's keras implementation of YOLOv3](https://github.com/qqwweee/keras-yolo3)
 * [geaxgx's playing card generation implementation](https://github.com/geaxgx/playing-card-detection)
+* [AntonMu's implementation of training your own YOLO](https://github.com/AntonMu/TrainYourOwnYOLO)
