@@ -67,7 +67,7 @@ From the main directory move trained_weights_final.h5 to the Model_Weights folde
 
 To detect cards, you need a webcam.
 However, it is also possible to use a phone as a webcam, by installing Droidcam on your phone and Droidcam client on your pc.
-Make sure both the phone and pc are on the same network, and connect the two by writing the info on the phone inside the client.
+Make sure both the phone and pc are on the same network, and connect the two by writing the info on the phone inside the client. The project will work perfectly fine with just a webcam, but the user exerperience will be better if you use a phone.
 
 [DroidCam](https://www.dev47apps.com/)
 
