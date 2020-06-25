@@ -90,13 +90,13 @@ If no errors appear, the project will have been successfully implemented.
     1. Both the phone and PC must be on the same WiFi
     1. The PC's device IP must match the phone's IP for it to be able to connect
 2. Run the Detector_Mod.py program
-3. Start detecting cards for every pile
-    3. Choose a pile to add the card to by pressing "1 - 7" or the arrow keys on the keyboard
-    3. If a mistake was made, clear the pile by pressing "c"
-    3. When done scanning press "e"
+3. Start detecting cards for every pile 
+    1. Choose a pile to add the card to by pressing "1 - 7" or the arrow keys on the keyboard
+    1. If a mistake was made, clear the pile by pressing "c"
+    1. When done scanning press "e"
 4. When all piles have been scanned, the game begins.
-    4. Scan the waste pile when needed
-    4. Try to follow the moves being indicated on the GUI
+    1. Scan the waste pile when needed
+    1. Try to follow the moves being indicated on the GUI
 5. Have fun!
 
 ## Authors
