@@ -422,12 +422,10 @@ while not game_has_ended:
     if k == 27:  # When 'ESC' is pressed, we exit.
         break
     if k == 99 and not is_confirming_move:  # When 'c' is pressed we clear current pile
-        print("please clear")
         clear_current_pile()
     if (k == 32 or (47 < k < 56)) and not is_confirming_move:  # When 'SPACE' or '0..7' is pressed we change pile
         change_pile(k)
     if k == 101:  # When 'e' is pressed, we stop scanning or confirm move
-        print("Just pressed e")
         if not is_confirming_move:
             # if we are not in the middle of a move, we request a move.
             some_move = get_move()
