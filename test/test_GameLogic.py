@@ -856,6 +856,7 @@ class TestGameLogic(TestCase):
         self.assertEqual(self.gl.check_foundation_card_pile(3, "c"), -1)
 
     # TC04 - Test Case (Simulerer flere spil, printer win rate)
+    # Denne function er skrevet af Jákup Viljam Dam (s185095) og Asama Hayder (s185099)
     def test_simulate_many_games(self):
         number_of_games = 1000
         number_of_wins = 0

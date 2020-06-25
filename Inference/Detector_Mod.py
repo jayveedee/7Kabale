@@ -6,19 +6,18 @@ import cv2
 This file is a modified version of the Detector.py from 
 the following repository: https://github.com/AntonMu/TrainYourOwnYOLO
 We have changed a lot to make the code fit our needs.
+We have marked all code that we haven't written between two '****'
 
-Modifications made by Asama Hayder (s185099)
+All modifications in this file made by Asama Hayder (s185099)
 """
 
-#EOW HUSK AT MARKERE HVILKE METODER DER ER VORES OG HVILKE DER ER FRA REPOEN.
-#OG HUSK AT SIGE TIL FÆRGEN AT HAN OGSÅ SKAL SKRIVE SIT NAVN PÅ SIN KODE
-#OG HUSK AT SKRIVE DIT NAVN PÅ SIMULATIONS-KODEN SAMMEN MED FÆRGEN!
 
+# ****
 def get_parent_dir(n=1):
     """ returns the n-th parent directory of the current
     working directory """
     current_path = os.path.dirname(os.path.abspath(__file__))
-    for k in range(n):
+    for i in range(n):
         current_path = os.path.dirname(current_path)
     return current_path
 
@@ -28,64 +27,44 @@ utils_path = os.path.join(get_parent_dir(1), "Utils")
 
 sys.path.append(src_path)
 sys.path.append(utils_path)
+# ****
 
+# We start a video_stream from the webcam
 video_stream = cv2.VideoCapture(0)
 
-# for me, pycharm says that no module named Dictionaries and Keras_yolo3.yolo but they are detected and works fine.
-# Maybe a bug?
-
-import argparse
+# pycharm says that no module named Dictionaries and Keras_yolo3.yolo but they are detected and works fine.
 import Dictionaries
 import GameLogic
 from keras_yolo3.yolo import YOLO
 from PIL import Image
 import numpy as np
-import copy
 
-move_text = ""
-list_of_piles = Dictionaries.list_of_piles
-list_of_piles_only_containing_newly_detected_cards = Dictionaries.list_of_piles_only_containing_newly_detected_cards
 dictionary_of_pile_names = Dictionaries.dictionary_of_pile_names
 dictionaryOfIndexToName = Dictionaries.dictionaryOfIndexToName
 dictionaryOfCardFrameCounter = Dictionaries.dictionaryOfCardFrameCounter
-dictionaryOfDetectedCards = Dictionaries.dictionaryOfDetectedCards
-dictionaryOfNewlyDiscoveredCards = Dictionaries.dictionaryOfNewlyDiscoveredCards
 current_pile = 0
 
+
+# This function is run when a card is detected.
 def detect_card(some_prediction):
-    # we assume that if there was unknown cards, then you have just scanned it. However, we should make a smarter way
-    # to detect if the unknown card has been scanned.
-    # global there_are_unknown_cards
-    # there_are_unknown_cards = False
-
+    # we get the card as an index, but we want the name.
     card_name = dictionaryOfIndexToName.get(some_prediction[4])
-    #dictionaryOfDetectedCards[card_name] = True
-    #dictionaryOfNewlyDiscoveredCards[card_name] = True
-    #list_of_piles[current_pile].append(card_name)
 
-    #if not game_has_just_started:
-    #    list_of_piles_only_containing_newly_detected_cards[current_pile].append(card_name)
-        # list_of_piles[current_pile].append(card_name)
-
+    # Adding the detected card to the current pile.
     if 6 < current_pile < 11:
         foundation_piles.get(current_pile-7).append(card_name)
     elif current_pile < 7:
         tableu_piles.get(current_pile).append(card_name)
     else:
-        # unknown_waste = game_logic.get_unknown_counter()
-        # unknown_waste -= 1
-        #TODO: this is a temporary løsning
-        #game_logic.unknownWaste -= 1
-
-        if game_logic.unknownWaste == 0:
-            game_logic.allUnknownWasteFound = True #HMMMMM, dette kommer måske ikke til at virke.
         waste_pile.append(card_name)
 
-    sortLists(tableu_piles, foundation_piles, waste_pile)
+    sort_lists(tableu_piles, foundation_piles, waste_pile)
 
     return
 
 
+# This function increments the number of times a card has been seen sequentially. If the number reaches a specified
+# amount, then we detect the card.
 def increment_card_viewed_counter(some_prediction):
     number_of_times_a_card_should_be_seen_sequentially = 15
 
@@ -95,16 +74,20 @@ def increment_card_viewed_counter(some_prediction):
     if check_if_card_already_detected(card_name):
         return
 
+    # we keep track of how many times all cards has been seen in a dictionary.
     number_of_times_viewed = dictionaryOfCardFrameCounter.get(card_name)
     number_of_times_viewed += 1
     if number_of_times_viewed >= number_of_times_a_card_should_be_seen_sequentially:
         detect_card(some_prediction)
     else:
+        # updating the dictionary
         dictionaryOfCardFrameCounter[card_name] = number_of_times_viewed
 
     return
 
 
+# This function simply checks if a card has already been detected. We need to check all the piles.
+# Tableu_piles and foundation_piles are dictionaries of lists, while the waste_pile is simply a list.
 def check_if_card_already_detected(card_name):
     detected = False
     for some_key, pile in tableu_piles.items():
@@ -121,19 +104,14 @@ def check_if_card_already_detected(card_name):
     return detected
 
 
-def show_detected_cards(some_image, font, text_size, text_thickness, border_color, border_thickness):
+# This functions displays all the cards in the current pile.
+def display_cards_in_current_pile(some_image, font, text_size, text_thickness, border_color, border_thickness):
     cards_color = (3, 186, 252, 255)
     list_of_detected_cards = "Cards: "
 
-    """for some_name in list_of_piles[current_pile]:
-        list_of_detected_cards += some_name
-        list_of_detected_cards += " ,"""
-
-    # print(tableu_piles)
-    # print(foundation_piles)
-    # print(waste_pile)
-
-    #TODO: Fix that foundation piles shows the waste card piles
+    # We sort the lists differently based on if it is a tableu, foundation or waste pile.
+    # This is because if there is no space left on the screen and we can't show all cards at once,
+    # then we just want to show the must important cards. e.g. in foundation it is the the highest numbers.
     if 6 < current_pile < 11:
         some_range = range(6)
         pile = foundation_piles.get(current_pile-7)
@@ -148,7 +126,7 @@ def show_detected_cards(some_image, font, text_size, text_thickness, border_colo
         if len(pile) > 7:
             list_of_detected_cards += "..."
             for i in some_range:
-                list_of_detected_cards += pile[len(pile)-i-1]  # we get the last/first 6 cards if there is no space for all.
+                list_of_detected_cards += pile[len(pile)-i-1]
                 list_of_detected_cards += ", "
         else:
             for card in pile:
@@ -161,8 +139,8 @@ def show_detected_cards(some_image, font, text_size, text_thickness, border_colo
     return
 
 
-# displays various text
-def show_text(some_image, move):
+# displays all the text on the screen.
+def display_text(some_image, move):
     text_color = (255, 255, 255, 255)  # remember it is in bgr
     text_border_color = (0, 0, 0, 255)
     text_size = .75
@@ -173,12 +151,7 @@ def show_text(some_image, move):
     cv2.putText(some_image, "'ESC' to exit", (0, 30), font, text_size, text_border_color, border_thickness)
     cv2.putText(some_image, "'ESC' to exit", (0, 30), font, text_size, text_color, text_thickness)
 
-
-    """if move is not None and move[0] is not "NA" and not there_are_unknown_cards:
-        cv2.putText(some_image, "'e' to confirm move", (0, 70), cv2.FONT_HERSHEY_DUPLEX, .75,
-                    (209, 80, 0, 255), 2)"""
-
-    # if move is not None and move[0] is not "NA":
+    # depending on if you are in the middle of a move or not, then we display different info.
     if is_confirming_move:
         cv2.putText(some_image, "'e' to confirm move", (0, 70), font, text_size, text_border_color, border_thickness)
         cv2.putText(some_image, "'e' to confirm move", (0, 70), font, text_size, text_color, text_thickness)
@@ -202,30 +175,25 @@ def show_text(some_image, move):
         cv2.putText(some_image, pile_text, (x_coordinate, 30), font, text_size, text_border_color, border_thickness)
         cv2.putText(some_image, pile_text, (x_coordinate, 30), font, text_size, text_color, text_thickness)
 
-        show_detected_cards(some_image, font, text_size, text_thickness, text_border_color, border_thickness)
+        display_cards_in_current_pile(some_image, font, text_size, text_thickness, text_border_color, border_thickness)
 
-    show_move(move, some_image, font, text_size, text_thickness, text_border_color, border_thickness)
+    display_move(move, some_image, font, text_size, text_thickness, text_border_color, border_thickness)
 
     return
 
 
-def show_move(move, some_image, font, text_size, text_thickness, border_color, border_thickness):
-    move_color = (0, 255, 0, 255)
-    # Creating the text that will be displayed
+# This function displays the current move, or displays what to do if there is no move.
+def display_move(move, some_image, font, text_size, text_thickness, border_color, border_thickness):
     global move_text
-    # global there_are_unknown_cards
+    move_color = (0, 255, 0, 255)
 
-    """elif there_are_unknown_cards:
-        move_text = "Flip and Scan the unknown card"""""
+    # Creating the text that will be displayed
     if game_has_just_started:
         move_text = "Scan first card of each pile"
     else:
-
-        """if move is None or move[0] == "NA":
-            move_text = "No move. Scan from waste/flip cards."""
         if not is_confirming_move:
             move_text = "Scan from waste/flip cards."
-        elif move[0] != "NA":
+        elif move[0] != "NA" and move[0] != "WIN":
             card_number = move[0]
             card_suit = move[1]
             from_pile = move[2]
@@ -235,21 +203,14 @@ def show_move(move, some_image, font, text_size, text_thickness, border_color, b
             move_text = f"move {card_number}{card_suit} from pile {int(from_pile) + 1} to pile {int(to_pile) + 1} " \
                         f"in group {pile_group}"
 
-    # print(move_text)
-
     # Calculating the coordinates and displaying the text
-    border_text_size = cv2.getTextSize(move_text, font, text_size, border_thickness)[0]
     text_width = cv2.getTextSize(move_text, font, text_size, text_thickness)[0]
 
     x_coordinate = (some_image.shape[1] - text_width[0])/2
     y_coordinate = (some_image.shape[0] - text_width[1])
-    x_b_coordinate = (some_image.shape[1] - border_text_size[0])/2
-    y_b_coordinate = (some_image.shape[0] - border_text_size[1])
 
     x_rounded = int(round(x_coordinate))
     y_rounded = int(round(y_coordinate))
-    x_b_rounded = int(round(x_b_coordinate))
-    y_b_rounded = int(round(y_b_coordinate))
 
     cv2.putText(some_image, move_text, (x_rounded, y_rounded), font, text_size,
                 border_color, border_thickness)
@@ -259,11 +220,13 @@ def show_move(move, some_image, font, text_size, text_thickness, border_color, b
     return
 
 
+# This function cahnges the current pile. It takes some_k which is a key-press.
 def change_pile(some_k):
     global current_pile
     total_number_of_piles = len(dictionary_of_pile_names)
     max_pile_index = total_number_of_piles - 1
 
+    # If the key isn't SPACE we want to change to the exact pile
     if some_k != 32:
         switch = {
             48: 12,
@@ -275,9 +238,9 @@ def change_pile(some_k):
             54: 6,
             55: 7
         }
-
         current_pile = switch.get(some_k)-1
     else:
+        # else we simply increment the current pile number.
         if current_pile == max_pile_index:
             current_pile = 0
         else:
@@ -286,6 +249,7 @@ def change_pile(some_k):
     return
 
 
+# This function clears the current pile.
 def clear_current_pile():
     if 6 < current_pile < 11:
         pile = foundation_piles[current_pile-7]
@@ -293,25 +257,14 @@ def clear_current_pile():
         pile = tableu_piles[current_pile]
     else:
         pile = waste_pile
-        # unknown_waste_counter = game_logic.get_unknown_counter()
-        # unknown_waste_counter = 24
-        game_logic.unknownWaste = 24
-        game_logic.allUnknownWasteFound = False
 
     pile.clear()
-
-    """for card in list_of_piles[current_pile]:
-        dictionaryOfDetectedCards[card] = False
-        dictionaryOfNewlyDiscoveredCards[card] = False
-        dictionaryOfCardFrameCounter[card] = 0
-
-    list_of_piles_only_containing_newly_detected_cards[current_pile].clear()
-    list_of_piles[current_pile].clear()"""
 
     return
 
 
-def sortLists(some_tableu_piles, some_foundation_piles, some_waste_cards):
+# This function is used to sort the lists so it makes sense to what type of pile it is. e.g. if it is a foundation pile, then we want the numbers decreasing etc.
+def sort_lists(some_tableu_piles, some_foundation_piles, some_waste_cards):
 
     for some_key, pile in some_tableu_piles.items():
         pile.sort(reverse=False)
@@ -321,157 +274,47 @@ def sortLists(some_tableu_piles, some_foundation_piles, some_waste_cards):
     return some_tableu_piles, some_foundation_piles, some_waste_cards
 
 
-def done_scanning():
+# This function is used when you are done scanning and want to check for a move.
+def get_move():
     global game_has_just_started
     global game_logic
-    global list_of_piles
     global extra_move
 
-    # print(game_logic.unknownWaste)
-    #if game_logic.unknownWaste == 0:
-     #   print(game_logic.unknownWasteCounter)
-
-    #print(len(game_logic.logicWasteCardPile))
-
-    #game_logic.allUnknownWasteFound = True
-
-    #game_logic.handle_update_reversed_waste_pile()
-
-    #print (game_logic.unknownWasteCounter)
-
+    # It is no longer the first move in the game
     if game_has_just_started:
         game_has_just_started = False
 
-    """  # send data to Logic
-    list_of_tableu_piles, list_of_foundation_piles, waste_cards = make_separate_lists(list_of_piles)
-
-    list_of_tableu_piles, list_of_foundation_piles, waste_cards = sortLists(list_of_tableu_piles, list_of_foundation_piles, waste_cards)
-
-    list_of_tableu_piles, list_of_foundation_piles, new_waste_cards \
-        = make_separate_lists(list_of_piles_only_containing_newly_detected_cards)
-
-    list_of_tableu_piles, list_of_foundation_piles, new_waste_cards \
-        = sortLists(list_of_tableu_piles, list_of_foundation_piles, new_waste_cards)
-
-    if len(new_waste_cards) != 0:
-        last_waste_card = new_waste_cards[len(new_waste_cards) - 1]
-        game_logic.update_logic_scan(last_waste_card, list_of_tableu_piles, list_of_foundation_piles)
-        print("********************************************************")
-        print("Sending the following to logic:")
-        print(f"Tableu_piles: {list_of_tableu_piles}")
-        print(f"Foundation_piles: {list_of_foundation_piles}")
-        print(f"waste_cards: {last_waste_card}")
-        print(" ")
-    else:
-        game_logic.update_logic_scan(None, list_of_tableu_piles, list_of_foundation_piles)
-        print("********************************************************")
-        print("Sending the following to logic:")
-        print(f"Tableu_piles: {list_of_tableu_piles}")
-        print(f"Foundation_piles: {list_of_foundation_piles}")
-        print(f"waste_cards: None")
-        print(" ")"""
-
-
-        # game_logic.update_logic_scan(new_waste_cards, list_of_tableu_piles, list_of_foundation_piles)
-
-
-
-        # We clear the lists of newly detected cards
-        #for pile in range(12):
-        #    list_of_piles_only_containing_newly_detected_cards[pile].clear()
-
+    # calculating the move
     move = game_logic.calculate_move(True)
     print(move)
+
+    # updating the cards inside the logic by using the move from logic.
     game_logic.update_logic_move(move)
-    if move[0]
-    """list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards = game_logic.get_piles()
 
-    print("Getting the following piles from logic:")
-    print(f"Tableu_piles: {list_of_tableu_piles}")
-    print(f"Foundation_piles: {list_of_foundation_piles}")
-    print(f"waste_cards: {list_of_waste_cards}")
-    print(" ")
-
-    update_card_piles(list_of_tableu_piles, list_of_foundation_piles, list_of_waste_cards)
-    counter = game_logic.get_unknown_counter()
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    print(counter)"""
+    # This code is used to fix a bug, where we need to get move twice.
+    if move[0] == "NA" and extra_move == 0:
+        move = game_logic.calculate_move(True)
+        game_logic.update_logic_move(move)
+        extra_move += 1
+    elif extra_move > 0 and move[0] != "NA" and move[0] != "LOSE" and move[0] != "WIN":
+        extra_move = 0
 
     return move
 
 
-# This function checks if the move tells us to flip cards
-def check_for_unknown_cards(move):
-    if move is None:
-        return False
-
-    there_is_an_unknown_card = False
-
-    if move[6] == "YES":
-        there_is_an_unknown_card = True
-
-    return there_is_an_unknown_card
-
-
+# This function checks if the game has finished.
 def check_for_win_condition(move):
     global game_has_ended
     if move is None:
         return
 
     if move[0] == "WIN":
-        print("You have won, closing now")
-        game_has_ended = True
-        return
-
-    if move[0] == "LOSE":
-        print("You have lost, closing now")
+        print("*************** You have won, closing now ***************")
         game_has_ended = True
         return
 
 
-# This function is used to separate a list into 3 smaller lists of foundation, tableau and waste piles. This is used to
-# make logic and computer_vision compatible with each other.
-def make_separate_lists(source_list):
-    list_of_tableu_piles = {0: [],
-                            1: [],
-                            2: [],
-                            3: [],
-                            4: [],
-                            5: [],
-                            6: []}
-    list_of_foundation_piles = {0: [],
-                                1: [],
-                                2: [],
-                                3: []}
-
-    for pile in range(11):
-        if pile > 6:
-            list_of_foundation_piles[pile - 7] = source_list[pile]
-        else:
-            list_of_tableu_piles[pile] = source_list[pile]
-
-    return list_of_tableu_piles, list_of_foundation_piles, source_list[11]
-
-
-def update_card_piles(tableu_piles, foundation_piles, waste_cards):
-    global list_of_piles
-    for pile in range(11):
-        if pile > 6:
-            list_of_piles[pile] = copy.deepcopy(foundation_piles[pile-7])
-        else:
-            list_of_piles[pile] = copy.deepcopy(tableu_piles[pile])
-        list_of_piles[11] = copy.deepcopy(waste_cards)
-
-    print("this is all the piles in this part after getting the piles from logic:")
-    print(list_of_piles)
-    print(" ")
-    print("************************************************************************")
-
-    return
-
-
-# def update_piles
-
+# ****
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 # Set up folder names for default values
@@ -499,9 +342,10 @@ yolo = YOLO(
 class_file = open(model_classes, "r")
 input_labels = [line.rstrip("\n") for line in class_file.readlines()]
 print("Found {} input labels: {} ...".format(len(input_labels), input_labels))
+# ****
 
 game_has_ended = False
-game_has_just_started = True
+game_has_just_started = True  # Used to display different info at the start of the game
 some_move = None
 is_confirming_move = False  # the confirming_move-state is when the player is doing the move physically.
 game_logic = None
@@ -509,15 +353,15 @@ tableu_piles = {}
 foundation_piles = {}
 waste_pile = []
 game_logic = GameLogic.GameLogic(None, None, None)
-extra_move = 0
-# there_are_unknown_cards = False
+extra_move = 0  # Used to fix a bug where we need to press 'e' twice.
+move_text = ""
 
+# This is the big game loop. It continues until the game has ended.
 while not game_has_ended:
+    # We check if we had a move from last frame.
     if some_move is not None:
         if some_move[0] == "NA":
             is_confirming_move = False
-
-    # print(list_of_piles)
 
     # Getting the piles from the logic.
     tableu_piles, foundation_piles, waste_pile = game_logic.get_piles()
@@ -526,6 +370,7 @@ while not game_has_ended:
     ret, img = video_stream.read()
     final_image = img
 
+    # This is where the detection happens. We only want to detect cards if we are not in the middle of a move.
     if not is_confirming_move:
         # converting image to make it work with the detection
         im_pil = Image.fromarray(img)
@@ -568,35 +413,42 @@ while not game_has_ended:
             if not found_card:
                 dictionaryOfCardFrameCounter[key] = 0
 
+        # We convert the image back to open_cv form.
         opencv_image = np.asarray(image)
         final_image = opencv_image
 
+    # we wait 1 millisecond every frame for a potential keypress.
     k = cv2.waitKey(1) & 0xff
     if k == 27:  # When 'ESC' is pressed, we exit.
         break
     if k == 99 and not is_confirming_move:  # When 'c' is pressed we clear current pile
+        print("please clear")
         clear_current_pile()
     if (k == 32 or (47 < k < 56)) and not is_confirming_move:  # When 'SPACE' or '0..7' is pressed we change pile
         change_pile(k)
     if k == 101:  # When 'e' is pressed, we stop scanning or confirm move
         print("Just pressed e")
         if not is_confirming_move:
-            some_move = done_scanning()
+            # if we are not in the middle of a move, we request a move.
+            some_move = get_move()
+            # then we check if the received move is valid.
             if some_move[0] != "NA":
                 is_confirming_move = True
         else:
-            if some_move[6] == "YES" and some_move[5] != "W": #TODO: FIX WHEN IT IS THE WASTE CARD
-                # TODO: EOW PRINT EN 6'SER YO
+            # here we check if there are unknown cards that we need to flip. In that case, we do not request another move.
+            if some_move[6] == "YES" and some_move[5] != "W":
                 is_confirming_move = False
             else:
-                some_move = done_scanning()
+                some_move = get_move()
 
-
+    # Check if the game has ended
     check_for_win_condition(some_move)
-    show_text(final_image, some_move)
+    # Drawing text on image
+    display_text(final_image, some_move)
+    # Showing image
     cv2.imshow('img', final_image)
 
-
+# Closing the application.
 cv2.destroyAllWindows()
 video_stream.release()
 yolo.close_session()
