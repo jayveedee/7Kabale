@@ -6,11 +6,13 @@ import random
 import copy
 import numpy as np
 
+# Coded by: Jákup Viljam Dam & Asama Hayder
+# Project: 7-kabal
 
 class TestGameLogic(TestCase):
 
     # TC00 - Test Case (Spil et spil færdigt) VIRKER IKKE MERE FORDI OPDATERET PRIORITETER
-    def test_play_game_one(self):
+    def test_play_game_one(self): # Jákup Viljam Dam
         tb = create_list(["06 h"], ["06 c"], ["13 d"], ["04 d"], ["03 h"], ["02 s"], ["08 c"])
         fd = {0: [], 1: [], 2: [], 3: []}
         wc = []
@@ -515,7 +517,7 @@ class TestGameLogic(TestCase):
                            ["NA", "NA", "NA", "NA", "NA"])
 
     # TC00 - Test Case (Spil et spil færdigt) VIRKER IKKE MERE FORDI OPDATERET PRIORITETER
-    def test_play_game_two(self):
+    def test_play_game_two(self): # Jákup Viljam Dam
         gl = create_empty_object()
         waste_card_pile_actual = []
         tableau_actual = create_list(["12 d"], ["03 d"], ["01 d"], ["11 c"], ["05 d"], ["10 d"], ["09 c"])
@@ -642,7 +644,7 @@ class TestGameLogic(TestCase):
                 gl.update_logic_scan(list_of_updates[i], None, None)
 
     # TC01 - Test Case (Opdater via scan)
-    def test_update_logic_scan(self):
+    def test_update_logic_scan(self): # Jákup Viljam Dam
         gl = create_empty_object()
         waste_card_pile_actual = []
         waste_card_unknown_actual = 24
@@ -716,7 +718,7 @@ class TestGameLogic(TestCase):
         return
 
     # TC02 - Test Case (Opdater via træk)
-    def test_update_logic_move(self):
+    def test_update_logic_move(self): # Jákup Viljam Dam
         gl = create_empty_object()
         waste_card_pile_actual = ["11 c", "02 s", "01 h"]
         tableau_actual = create_list(["01 s"], ["13 c"], ["12 h"], ["07 d"], ["08 s"], ["06 c"], ["09 h"])
@@ -769,7 +771,7 @@ class TestGameLogic(TestCase):
         self.assertEqual(gl.unknownTableau[6], 5)
 
     # TC03 - Test Case (Kalkuler et træk)
-    def test_calculate_move(self):
+    def test_calculate_move(self): # Jákup Viljam Dam
         gl = create_empty_object()
         waste_card_pile_actual = ["08 s", "12 c", "03 c", "03 d", "09 d"]
         waste_card_unknown_actual = 24
@@ -789,7 +791,7 @@ class TestGameLogic(TestCase):
             gl.update_logic_move(gl.calculate_move())
 
     # Test prioriteter
-    def test_priorities(self):
+    def test_priorities(self): # Jákup Viljam Dam
         gl = create_empty_object()
         waste_card_pile_actual = []
         tableau_actual = create_list(["06 c"], ["06 s"], ["07 d"], [], [], [], [])
@@ -846,8 +848,16 @@ class TestGameLogic(TestCase):
 
         self.assertListEqual(gl.calculate_move(), ["05", "c", "0", "2", "T", "T", "NO"])
 
+        gl = create_empty_object()
+        waste_card_pile_actual = []
+        tableau_actual = create_list([], ["01 d", "02 d", "03 d", "04 d", "05 d", "06 d", "07 d", "08 d", "09 d", "10 d", "11 d", "12 d", "13 d"], [], [], [], [], [])
+        foundation_actual = create_list([], [], [], [])
+        gl.reset_logic(waste_card_pile_actual, tableau_actual, foundation_actual)
+
+        self.assertListEqual(gl.calculate_move(), ["01", "d", "1", "0", "F", "T", "TOPCARD"])
+
     # Tester tilføjelse af kort til fundamentet
-    def test_check_foundation_card_pile(self):
+    def test_check_foundation_card_pile(self): # Jákup Viljam Dam
         self.insertVariables(0)
 
         self.assertEqual(self.gl.check_foundation_card_pile(3, "h"), 2)
@@ -856,9 +866,8 @@ class TestGameLogic(TestCase):
         self.assertEqual(self.gl.check_foundation_card_pile(3, "c"), -1)
 
     # TC04 - Test Case (Simulerer flere spil, printer win rate)
-    # Denne function er skrevet af Jákup Viljam Dam (s185095) og Asama Hayder (s185099)
-    def test_simulate_many_games(self):
-        number_of_games = 1000
+    def test_simulate_many_games(self): # Asama Hayder & Jákup Viljam Dam
+        number_of_games = 2000
         number_of_wins = 0
 
         print(f"Simulating {number_of_games} solitaire games...")
@@ -945,14 +954,14 @@ class TestGameLogic(TestCase):
         print(f"Average number of moves: {self.game_moves_mean(list_of_games)}")
 
     # Win rate %
-    def game_moves_mean(self, list_of_games):
+    def game_moves_mean(self, list_of_games): # Jákup Viljam Dam
         means = 0
         for i in range(len(list_of_games)):
             means += np.mean(len(list_of_games[i]) - 1)
         return means/len(list_of_games)
 
     # Hjælpemetoder - instantier random spil
-    def setup_a_random_game(self):
+    def setup_a_random_game(self): # Asama Hayder
         global dictionary_of_cards
 
         # reset the dictionary from previous game
@@ -972,7 +981,7 @@ class TestGameLogic(TestCase):
         return tableu_piles, foundation_piles, waste_pile
 
     # Hjælpemetoder - hent et random kort
-    def get_random_card(self):
+    def get_random_card(self): # Asama Hayder
         # creating a list of cards that has not been taken.
         list_of_possible_cards = []
         for card, value in dictionary_of_cards.items():
@@ -989,7 +998,7 @@ class TestGameLogic(TestCase):
             return None
 
     # Hjælpemetoder - tjekker om calculate move og update move bliver til de rigtige ting
-    def calculateMove(self, trueMove, trueResult):
+    def calculateMove(self, trueMove, trueResult): # Jákup Viljam Dam
         move = self.gl.calculate_move()
         # Calculates the move
         self.assertListEqual(move, trueMove)
@@ -997,7 +1006,7 @@ class TestGameLogic(TestCase):
         self.assertListEqual(self.gl.update_logic_move(move), trueResult)
 
     # Hjælpemetoder - opdaterer en specifik dictionary liste's element
-    def updateLists(self, whereTo, card, index):
+    def updateLists(self, whereTo, card, index): # Jákup Viljam Dam
         if whereTo == "T":
             taaa = (copy.deepcopy(self.gl.logicTableauCardPiles))
             if card != "NA":
@@ -1032,7 +1041,7 @@ class TestGameLogic(TestCase):
             self.assertListEqual(waa, waaa)
 
 # Hjælpemetoder - laver dictionaries
-def create_list(li0, li1, li2, li3, li4=None, li5=None, li6=None):
+def create_list(li0, li1, li2, li3, li4=None, li5=None, li6=None): # Jákup Viljam Dam
     if li4 is not None:
         dict_lists = {0: li0, 1: li1, 2: li2, 3: li3, 4: li4, 5: li5, 6: li6}
     else:
@@ -1040,7 +1049,7 @@ def create_list(li0, li1, li2, li3, li4=None, li5=None, li6=None):
     return dict_lists
 
 # Hjælpemetoder - laver et tomt gamelogic object
-def create_empty_object():
+def create_empty_object(): # Jákup Viljam Dam
     list0 = [];
     list00 = [];
     list000 = [];
