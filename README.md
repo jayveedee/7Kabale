@@ -137,10 +137,10 @@ If no errors appear, the project will have been successfully implemented.
 ## Authors
 
 * **Asama Hayder** - *CV & ML* - [asamahayder](https://github.com/asamahayder)
-* **Christoffer A. Detlef** - *Project Manaegment* - [ChrisMizz](https://github.com/ChrisMizz)
+* **Christoffer A. Detlef** - *Project Management* - [ChrisMizz](https://github.com/ChrisMizz)
 * **Jákup V. Dam** - *Logic* - [jayveedee](https://github.com/jayveedee)
-* **Simon Andersen** - *Project Manaegment* - [ThaDuyx](https://github.com/ThaDuyx)
-* **Thaer Mhd. R. Almalla** - *Project Manaegment* - [Thaer91](https://github.com/Thaer91)
+* **Simon Andersen** - *Project Management* - [ThaDuyx](https://github.com/ThaDuyx)
+* **Thaer Mhd. R. Almalla** - *Project Management* - [Thaer91](https://github.com/Thaer91)
 
 ## Acknowledgments
 
